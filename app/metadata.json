@@ -1,0 +1,8 @@
+{
+  "name": "قدها",
+  "description": "منصة ملاءة مالية ذكية ومبتكرة مبنية على المصرفية المفتوحة تساعد أصحاب الدخل غير المنتظم على تقييم قدرتهم التمويلية وإصدار شهادة ملاءة مختصرة دون كشف الحساب الكامل.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

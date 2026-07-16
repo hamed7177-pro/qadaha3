@@ -1,0 +1,54 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Cairo", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  
+  /* Custom brand colors matching Alinma Bank + Tuwaiq visual identity */
+  --color-brand-navy: #071B33;      /* Alinma deep professional navy */
+  --color-brand-indigo: #24234F;    /* Deep technical indigo */
+  --color-brand-clay: #C86B4F;      /* Orange-clay accent for modern energy */
+  --color-brand-purple: #8F8BEA;    /* Tuwaiq purple touch */
+  --color-brand-bg: #F7F7F4;        /* Warm off-white */
+  --color-brand-gray: #EEF1F4;      /* Soft structural gray */
+  --color-brand-success: #2BB673;   /* Safe positive green */
+  --color-brand-warning: #E89E3A;   /* Safe orange/yellow for caution */
+  --color-brand-danger: #D64545;    /* Alert red */
+}
+
+/* Custom styling to ensure smooth RTL text alignments */
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-brand-bg);
+  color: var(--color-brand-navy);
+  direction: rtl;
+  text-align: right;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Print utilities for solvency certificate generation */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-brand-gray);
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
