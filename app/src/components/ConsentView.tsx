@@ -27,7 +27,7 @@ export default function ConsentView({ onNavigate }: ConsentViewProps) {
       
       {/* Steps Indicator Progress Bar */}
       <div className="bg-white rounded-2xl p-6 border border-brand-gray shadow-sm">
-        <div className="flex flex-row-reverse items-center justify-between relative max-w-2xl mx-auto">
+        <div className="flex items-center justify-between relative max-w-2xl mx-auto">
           {/* Progress Line */}
           <div className="absolute top-1/2 left-0 right-0 h-1 bg-brand-gray -translate-y-1/2 z-0"></div>
           <div className="absolute top-1/2 right-0 w-1/5 h-1 bg-brand-purple -translate-y-1/2 z-0 transition-all"></div>
@@ -82,7 +82,7 @@ export default function ConsentView({ onNavigate }: ConsentViewProps) {
         </div>
 
         {/* Reassurance Banner */}
-        <div className="bg-brand-navy/5 border-r-4 border-brand-purple p-4 rounded-xl flex items-start gap-3 flex-row-reverse text-right">
+        <div className="bg-brand-navy/5 border-r-4 border-brand-purple p-4 rounded-xl flex items-start gap-3 text-right">
           <ShieldAlert className="w-5 h-5 text-brand-purple shrink-0 mt-0.5" />
           <div className="space-y-1">
             <h4 className="text-sm font-bold text-brand-navy">مبدأ الخصوصية وتقليل البيانات</h4>
@@ -149,7 +149,7 @@ export default function ConsentView({ onNavigate }: ConsentViewProps) {
         <div className="space-y-4 pt-4 border-t border-brand-gray">
           <label 
             onClick={() => setAgreed(!agreed)}
-            className="flex items-start gap-3 flex-row-reverse text-right cursor-pointer group"
+            className="flex items-start gap-3 text-right cursor-pointer group"
           >
             <div className="shrink-0 mt-0.5 text-brand-purple">
               {agreed ? (
@@ -222,7 +222,7 @@ export default function ConsentView({ onNavigate }: ConsentViewProps) {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row-reverse gap-4 pt-4 justify-between border-t border-brand-gray">
+        <div className="flex flex-col sm:flex-row gap-4 pt-4 justify-between border-t border-brand-gray">
           <button
             id="btn-agree-continue"
             disabled={!agreed}

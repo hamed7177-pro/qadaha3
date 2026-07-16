@@ -56,7 +56,7 @@ export default function FunderView({ onNavigate, testedInstallment, initialVerif
     <div className="max-w-4xl mx-auto px-4 py-8 space-y-8 text-right">
       
       {/* Official Funder Portal Header */}
-      <div className="bg-brand-navy rounded-3xl p-6 sm:p-8 text-white shadow-md flex flex-col md:flex-row-reverse justify-between items-center gap-6">
+      <div className="bg-brand-navy rounded-3xl p-6 sm:p-8 text-white shadow-md flex flex-col md:flex-row justify-between items-center gap-6">
         <div className="space-y-1.5 text-center md:text-right">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-brand-purple text-xs font-bold">
             <Landmark className="w-3.5 h-3.5" />
@@ -78,7 +78,7 @@ export default function FunderView({ onNavigate, testedInstallment, initialVerif
 
       {/* Verification Code Search Form Bar */}
       <div className="bg-white rounded-2xl p-6 border border-brand-gray shadow-sm">
-        <form onSubmit={handleValidate} className="flex flex-col sm:flex-row-reverse gap-4">
+        <form onSubmit={handleValidate} className="flex flex-col sm:flex-row gap-4">
           <div className="flex-1 space-y-1.5">
             <label className="text-xs font-bold text-brand-navy block">أدخل رمز التوثيق المالي (Verification ID):</label>
             <div className="relative">
@@ -110,8 +110,8 @@ export default function FunderView({ onNavigate, testedInstallment, initialVerif
             <div className="bg-white rounded-3xl border-2 border-brand-navy p-6 sm:p-10 shadow-lg space-y-8 animate-fadeIn">
               
               {/* Header result banner */}
-              <div className="flex flex-col sm:flex-row-reverse justify-between items-center pb-6 border-b border-brand-gray gap-4">
-                <div className="flex items-center gap-3 flex-row-reverse">
+              <div className="flex flex-col sm:flex-row justify-between items-center pb-6 border-b border-brand-gray gap-4">
+                <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-brand-success/10 flex items-center justify-center text-brand-success">
                     <CheckCircle className="w-6 h-6" />
                   </div>
@@ -214,7 +214,7 @@ export default function FunderView({ onNavigate, testedInstallment, initialVerif
               </div>
 
               {/* Safety notice disclaimer */}
-              <div className="bg-brand-navy/5 p-4 rounded-xl text-xs text-slate-500 leading-relaxed text-right flex items-start gap-2.5 flex-row-reverse">
+              <div className="bg-brand-navy/5 p-4 rounded-xl text-xs text-slate-500 leading-relaxed text-right flex items-start gap-2.5">
                 <Lock className="w-5 h-5 text-brand-navy shrink-0 mt-0.5" />
                 <div className="space-y-0.5">
                   <span className="font-bold text-brand-navy block">بيئة خصوصية مضمونة وحماية معلومات العميل</span>

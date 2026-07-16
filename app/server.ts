@@ -36,14 +36,14 @@ function getGeminiClient(): GoogleGenAI {
 app.post('/api/gemini/chat', async (req, res) => {
   try {
     const { message, history } = req.body;
-    
+
     if (!message) {
       res.status(400).json({ error: 'Message is required' });
       return;
     }
 
     const ai = getGeminiClient();
-    
+
     // System instruction to act as Qadaha's smart financial counselor
     const systemInstruction = `
 أنت "مستشار قدها المالي الذكي" - مساعد ذكاء اصطناعي تفاعلي لمنصة "قدها" (منصة ملاءة مالية سعودية مبنية على المصرفية المفتوحة).
@@ -72,7 +72,7 @@ app.post('/api/gemini/chat', async (req, res) => {
     // Reconstruct the chat with the history provided
     // Using simple generateContent because it's stateless on the API level but we feed history
     const contents: any[] = [];
-    
+
     if (history && Array.isArray(history)) {
       history.forEach((msg: any) => {
         contents.push({
@@ -81,7 +81,7 @@ app.post('/api/gemini/chat', async (req, res) => {
         });
       });
     }
-    
+
     // Add the current prompt
     contents.push({
       role: 'user',
@@ -119,8 +119,8 @@ app.all('/api/*', async (req, res, next) => {
   if (req.path === '/api/gemini/chat' || req.path === '/api/health') {
     return next();
   }
-
-  const djangoUrl = `http://127.0.0.1:8000${req.originalUrl}`;
+  const urll = "http://127.0.0.1:8000"
+  const djangoUrl = `${urll}${req.originalUrl}`;
   try {
     const response = await fetch(djangoUrl, {
       method: req.method,
@@ -129,7 +129,7 @@ app.all('/api/*', async (req, res, next) => {
       },
       body: req.method !== 'GET' && req.method !== 'HEAD' ? JSON.stringify(req.body) : undefined,
     });
-    
+
     const contentType = response.headers.get('content-type');
     if (contentType && contentType.includes('application/json')) {
       const data = await response.json();

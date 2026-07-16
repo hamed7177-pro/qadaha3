@@ -42,7 +42,7 @@ export default function ResultView({ onNavigate, testedInstallment, financials, 
       
       {/* Steps Progress Bar */}
       <div className="bg-white rounded-2xl p-6 border border-brand-gray shadow-sm">
-        <div className="flex flex-row-reverse items-center justify-between relative max-w-2xl mx-auto">
+        <div className="flex items-center justify-between relative max-w-2xl mx-auto">
           <div className="absolute top-1/2 left-0 right-0 h-1 bg-brand-gray -translate-y-1/2 z-0"></div>
           <div className="absolute top-1/2 right-0 w-4/5 h-1 bg-brand-purple -translate-y-1/2 z-0 transition-all"></div>
           
@@ -199,7 +199,7 @@ export default function ResultView({ onNavigate, testedInstallment, financials, 
           </div>
 
           {/* Regulatory Warning Banner */}
-          <div className="bg-slate-50 border border-brand-gray p-4 rounded-2xl text-xs text-slate-500 leading-relaxed text-right flex items-start gap-2.5 flex-row-reverse">
+          <div className="bg-slate-50 border border-brand-gray p-4 rounded-2xl text-xs text-slate-500 leading-relaxed text-right flex items-start gap-2.5">
             <AlertTriangle className="w-4 h-4 text-brand-clay shrink-0 mt-0.5" />
             <div className="space-y-1">
               <span className="font-bold text-brand-navy block">تنبيه تنظيمي مهم:</span>

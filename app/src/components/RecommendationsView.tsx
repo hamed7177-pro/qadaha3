@@ -128,7 +128,7 @@ export default function RecommendationsView({ onNavigate, testedInstallment, fin
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 space-y-8 text-right">
       
-      <div className="flex flex-col md:flex-row-reverse justify-between items-start md:items-center gap-4">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h2 className="text-2xl font-black text-brand-navy">خطة التحسين والتوصيات الذكية</h2>
           <p className="text-xs text-slate-400">خطوات عملية وجدول زمني مدعوم بالذكاء الاصطناعي لرفع مؤشر قبولك المالي</p>
@@ -145,7 +145,7 @@ export default function RecommendationsView({ onNavigate, testedInstallment, fin
         
         {/* Timeline Improvement Steps */}
         <div className="lg:col-span-7 bg-white rounded-3xl border border-brand-gray p-6 sm:p-8 shadow-sm space-y-6">
-          <div className="flex justify-between items-center flex-row-reverse">
+          <div className="flex justify-between items-center">
             <h3 className="text-lg font-bold text-brand-navy">خارطة الطريق لتحسين الملاءة (30 / 60 / 90 يوم)</h3>
             <span className="text-xs text-brand-success font-bold bg-brand-success/10 px-2.5 py-1 rounded-full flex items-center gap-1">
               <TrendingUp className="w-3.5 h-3.5" />
@@ -161,9 +161,9 @@ export default function RecommendationsView({ onNavigate, testedInstallment, fin
                   <div className="w-1.5 h-1.5 rounded-full bg-brand-purple"></div>
                 </div>
 
-                <div className="flex justify-between items-baseline flex-row-reverse">
-                  <span className="text-xs bg-brand-purple/10 text-brand-purple font-bold px-2.5 py-0.5 rounded-full font-mono">{s.days}</span>
+                <div className="flex justify-between items-baseline">
                   <h4 className="text-base font-bold text-brand-navy">{s.title}</h4>
+                  <span className="text-xs bg-brand-purple/10 text-brand-purple font-bold px-2.5 py-0.5 rounded-full font-mono">{s.days}</span>
                 </div>
 
                 <p className="text-xs text-slate-600 leading-relaxed">{s.action}</p>
@@ -177,8 +177,8 @@ export default function RecommendationsView({ onNavigate, testedInstallment, fin
         <div className="lg:col-span-5 bg-white rounded-3xl border border-brand-gray shadow-md flex flex-col h-[520px] overflow-hidden relative">
           
           {/* Chat Header */}
-          <div className="p-4 bg-brand-navy text-white flex justify-between items-center flex-row-reverse border-b border-white/10 shrink-0">
-            <div className="flex items-center gap-2.5 flex-row-reverse">
+          <div className="p-4 bg-brand-navy text-white flex justify-between items-center border-b border-white/10 shrink-0">
+            <div className="flex items-center gap-2.5">
               <div className="w-9 h-9 rounded-xl bg-brand-clay flex items-center justify-center text-white shrink-0">
                 <MessageSquare className="w-5 h-5" />
               </div>
@@ -199,11 +199,11 @@ export default function RecommendationsView({ onNavigate, testedInstallment, fin
             {messages.map((m) => (
               <div 
                 key={m.id}
-                className={`flex gap-2.5 ${m.sender === 'user' ? 'justify-start flex-row' : 'justify-end flex-row-reverse'}`}
+                className={`flex gap-2.5 ${m.sender === 'user' ? 'justify-start' : 'justify-end'}`}
               >
                 {/* Text box */}
                 <div 
-                  className={`max-w-[85%] rounded-2xl p-3.5 text-xs leading-relaxed text-right relative shadow-sm ${m.sender === 'user' ? 'bg-gradient-to-l from-brand-navy to-brand-indigo text-white rounded-tl-none' : 'bg-white text-slate-800 border border-brand-gray rounded-tr-none'}`}
+                  className={`max-w-[85%] rounded-2xl p-3.5 text-xs leading-relaxed text-right relative shadow-sm ${m.sender === 'user' ? 'bg-gradient-to-l from-brand-navy to-brand-indigo text-white rounded-tr-none' : 'bg-white text-slate-800 border border-brand-gray rounded-tl-none'}`}
                 >
                   <p className="whitespace-pre-wrap">{m.text}</p>
                   <span className={`text-[8px] block mt-1.5 ${m.sender === 'user' ? 'text-white/50 text-left' : 'text-slate-400 text-left'}`}>
@@ -215,8 +215,8 @@ export default function RecommendationsView({ onNavigate, testedInstallment, fin
 
             {/* Simulated Typist loader */}
             {chatLoading && (
-              <div className="flex gap-2.5 justify-end flex-row-reverse">
-                <div className="bg-white border border-brand-gray rounded-2xl rounded-tr-none p-3.5 text-xs text-slate-500 shadow-sm">
+              <div className="flex gap-2.5 justify-end">
+                <div className="bg-white border border-brand-gray rounded-2xl rounded-tl-none p-3.5 text-xs text-slate-500 shadow-sm">
                   <div className="flex items-center gap-1 justify-center">
                     <span className="w-1.5 h-1.5 rounded-full bg-brand-purple animate-bounce"></span>
                     <span className="w-1.5 h-1.5 rounded-full bg-brand-purple animate-bounce delay-100"></span>
@@ -229,7 +229,7 @@ export default function RecommendationsView({ onNavigate, testedInstallment, fin
           </div>
 
           {/* Suggested quick questions scrollbar */}
-          <div className="p-2 border-t border-brand-gray bg-white overflow-x-auto whitespace-nowrap shrink-0 flex gap-2 justify-end no-scrollbar">
+          <div className="p-2 border-t border-brand-gray bg-white overflow-x-auto whitespace-nowrap shrink-0 flex gap-2 justify-start no-scrollbar">
             {suggestedQuestions.map((q, i) => (
               <button
                 key={i}

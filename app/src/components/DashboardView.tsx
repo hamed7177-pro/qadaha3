@@ -62,7 +62,7 @@ export default function DashboardView({ onNavigate, financials, loading }: Dashb
     <div className="max-w-7xl mx-auto px-4 py-8 space-y-8 text-right">
       
       {/* Welcome Banner */}
-      <div className="bg-gradient-to-l from-brand-navy to-brand-indigo rounded-3xl p-6 sm:p-8 text-white shadow-lg flex flex-col sm:flex-row-reverse justify-between items-center gap-6">
+      <div className="bg-gradient-to-l from-brand-navy to-brand-indigo rounded-3xl p-6 sm:p-8 text-white shadow-lg flex flex-col sm:flex-row justify-between items-center gap-6">
         <div className="space-y-2 text-center sm:text-right">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-brand-purple text-xs font-bold">
             <Sparkles className="w-3.5 h-3.5" />
@@ -89,7 +89,7 @@ export default function DashboardView({ onNavigate, financials, loading }: Dashb
         {/* Metric 1 */}
         <div className="bg-white rounded-2xl p-6 border border-brand-gray shadow-sm space-y-3">
           <span className="text-xs text-slate-400 font-bold block">متوسط الدخل الشهري (12 شهر)</span>
-          <div className="flex justify-between items-baseline flex-row-reverse">
+          <div className="flex justify-between items-baseline">
             <span className="text-2xl font-black text-brand-navy font-mono">{avgIncome.toLocaleString()} ر.س</span>
             <span className="text-xs text-brand-success font-bold flex items-center gap-0.5">
               <ArrowUpRight className="w-3 h-3" />
@@ -102,7 +102,7 @@ export default function DashboardView({ onNavigate, financials, loading }: Dashb
         {/* Metric 2 */}
         <div className="bg-white rounded-2xl p-6 border border-brand-gray shadow-sm space-y-3">
           <span className="text-xs text-slate-400 font-bold block">الالتزامات البنكية القائمة</span>
-          <div className="flex justify-between items-baseline flex-row-reverse">
+          <div className="flex justify-between items-baseline">
             <span className="text-2xl font-black text-brand-navy font-mono">{avgObligations.toLocaleString()} ر.س</span>
             <span className="text-xs text-brand-clay font-bold flex items-center gap-0.5">
               <span>{((avgObligations / avgIncome) * 100).toFixed(0)}% من الدخل</span>
@@ -114,7 +114,7 @@ export default function DashboardView({ onNavigate, financials, loading }: Dashb
         {/* Metric 3 */}
         <div className="bg-white rounded-2xl p-6 border border-brand-gray shadow-sm space-y-3">
           <span className="text-xs text-slate-400 font-bold block">الفائض المالي الشهري المتاح</span>
-          <div className="flex justify-between items-baseline flex-row-reverse">
+          <div className="flex justify-between items-baseline">
             <span className="text-2xl font-black text-brand-navy font-mono">{avgSurplus.toLocaleString()} ر.س</span>
             <span className="text-xs text-brand-success font-bold flex items-center gap-0.5">
               <span>{avgSurplus > 0 ? 'إيجابي' : 'سلبي'}</span>
@@ -126,7 +126,7 @@ export default function DashboardView({ onNavigate, financials, loading }: Dashb
         {/* Metric 4 */}
         <div className="bg-white rounded-2xl p-6 border border-brand-gray shadow-sm space-y-3">
           <span className="text-xs text-slate-400 font-bold block">مؤشر استقرار التدفق النقدي</span>
-          <div className="flex justify-between items-baseline flex-row-reverse">
+          <div className="flex justify-between items-baseline">
             <span className="text-2xl font-black text-brand-navy font-mono">{balanceStability}%</span>
             <span className="text-xs text-brand-purple font-bold">
               {balanceStability >= 75 ? 'ملاءة ممتازة' : balanceStability >= 50 ? 'ملاءة جيدة' : 'ملاءة بحذر'}
@@ -270,11 +270,10 @@ export default function DashboardView({ onNavigate, financials, loading }: Dashb
               </div>
             </div>
 
-            {/* Labels Legend */}
             <div className="w-full space-y-2">
               {categories.map((c, i) => (
                 <div key={i} className="flex justify-between items-center text-xs">
-                  <div className="flex items-center gap-2 flex-row-reverse">
+                  <div className="flex items-center gap-2">
                     <span className="w-2.5 h-2.5 rounded-full block" style={{ backgroundColor: c.color }}></span>
                     <span className="text-slate-600">{c.name}</span>
                   </div>
@@ -297,8 +296,8 @@ export default function DashboardView({ onNavigate, financials, loading }: Dashb
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           
-          <div className="p-4 rounded-2xl border border-brand-gray bg-slate-50/50 flex justify-between items-center flex-row-reverse text-right">
-            <div className="flex items-center gap-3 flex-row-reverse">
+          <div className="p-4 rounded-2xl border border-brand-gray bg-slate-50/50 flex justify-between items-center text-right">
+            <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-brand-navy/5 flex items-center justify-center text-brand-navy">
                 <Calendar className="w-5 h-5" />
               </div>
@@ -313,8 +312,8 @@ export default function DashboardView({ onNavigate, financials, loading }: Dashb
             </div>
           </div>
 
-          <div className="p-4 rounded-2xl border border-brand-gray bg-slate-50/50 flex justify-between items-center flex-row-reverse text-right">
-            <div className="flex items-center gap-3 flex-row-reverse">
+          <div className="p-4 rounded-2xl border border-brand-gray bg-slate-50/50 flex justify-between items-center text-right">
+            <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-brand-purple/5 flex items-center justify-center text-brand-purple">
                 <Clock className="w-5 h-5" />
               </div>

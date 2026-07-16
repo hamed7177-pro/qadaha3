@@ -65,7 +65,7 @@ export default function PrivacyView({ onNavigate }: PrivacyViewProps) {
       )}
 
       {/* Header */}
-      <div className="flex flex-col sm:flex-row-reverse justify-between items-start sm:items-center gap-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h2 className="text-2xl font-black text-brand-navy">إدارة الخصوصية والصلاحيات النشطة</h2>
           <p className="text-xs text-slate-400">تحكم بخصوصية بياناتك وصلاحيات الشهادة، والغي الارتباط فوراً بأي وقت</p>
@@ -80,7 +80,7 @@ export default function PrivacyView({ onNavigate }: PrivacyViewProps) {
 
       {/* Sharing controls switch card */}
       <div className="bg-white rounded-3xl p-6 sm:p-8 border border-brand-gray shadow-sm space-y-4">
-        <div className="flex justify-between items-center flex-row-reverse">
+        <div className="flex justify-between items-center">
           <div className="space-y-1">
             <h3 className="text-base font-bold text-brand-navy">مشاركة رابط الشهادة والتوثيق</h3>
             <p className="text-xs text-slate-400">عند تعطيل هذا الخيار، سيتم إلغاء صلاحية رابط التوثيق وQR للجهات الخارجية فوراً</p>
@@ -99,7 +99,7 @@ export default function PrivacyView({ onNavigate }: PrivacyViewProps) {
         </div>
 
         {/* Security alert box */}
-        <div className="bg-amber-50/50 border border-amber-500/20 rounded-2xl p-4 flex items-start gap-3 flex-row-reverse">
+        <div className="bg-amber-50/50 border border-amber-500/20 rounded-2xl p-4 flex items-start gap-3">
           <EyeOff className="w-5 h-5 text-brand-clay shrink-0 mt-0.5" />
           <div className="space-y-1">
             <span className="text-xs font-bold text-brand-navy block">مبدأ السيادة على البيانات:</span>
@@ -120,7 +120,7 @@ export default function PrivacyView({ onNavigate }: PrivacyViewProps) {
           <div className="space-y-4">
             
             {/* Scope 1 */}
-            <div className="flex justify-between items-center flex-row-reverse pb-3 border-b border-dashed border-slate-100 text-xs">
+            <div className="flex justify-between items-center pb-3 border-b border-dashed border-slate-100 text-xs">
               <div>
                 <span className="font-bold text-brand-navy block">قراءة وتحليل العمليات اليومية</span>
                 <span className="text-[10px] text-slate-400">نشطة للحسابات المرتبطة</span>
@@ -134,7 +134,7 @@ export default function PrivacyView({ onNavigate }: PrivacyViewProps) {
             </div>
 
             {/* Scope 2 */}
-            <div className="flex justify-between items-center flex-row-reverse pb-3 border-b border-dashed border-slate-100 text-xs">
+            <div className="flex justify-between items-center pb-3 border-b border-dashed border-slate-100 text-xs">
               <div>
                 <span className="font-bold text-brand-navy block">تحليل التدفق النقدي الإجمالي والمصاريف</span>
                 <span className="text-[10px] text-slate-400">مطلوبة لتحديث مؤشر الملاءة</span>
@@ -148,7 +148,7 @@ export default function PrivacyView({ onNavigate }: PrivacyViewProps) {
             </div>
 
             {/* Scope 3 */}
-            <div className="flex justify-between items-center flex-row-reverse pb-3 border-b border-dashed border-slate-100 text-xs">
+            <div className="flex justify-between items-center pb-3 border-b border-dashed border-slate-100 text-xs">
               <div>
                 <span className="font-bold text-brand-navy block">توليد شهادة الملاءة المختصرة</span>
                 <span className="text-[10px] text-slate-400">تسمح بإنتاج رابط مشاركة آمن</span>
@@ -181,11 +181,11 @@ export default function PrivacyView({ onNavigate }: PrivacyViewProps) {
           
           <div className="space-y-4">
             {logs.map((l, i) => (
-              <div key={i} className="flex gap-2.5 flex-row-reverse text-right text-xs leading-normal items-start">
+              <div key={i} className="flex gap-2.5 text-right text-xs leading-normal items-start">
                 <div className="w-2 h-2 rounded-full bg-brand-purple shrink-0 mt-1.5"></div>
                 <div className="space-y-0.5">
                   <span className="font-bold text-brand-navy block">{l.event}</span>
-                  <span className="text-[9px] text-slate-400 font-mono flex items-center gap-1 flex-row-reverse">
+                  <span className="text-[9px] text-slate-400 font-mono flex items-center gap-1">
                     <Clock className="w-3 h-3" />
                     <span>{l.date}</span>
                   </span>

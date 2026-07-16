@@ -199,7 +199,7 @@ export default function App() {
       <div className="space-y-8">
         
         {/* Brand Logo & Name */}
-        <div className="flex items-center gap-3 flex-row-reverse">
+        <div className="flex items-center gap-3">
           <div 
             onClick={() => handleNavigate('landing')}
             className="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-clay to-brand-purple flex items-center justify-center text-white font-black text-lg cursor-pointer hover:scale-105 transition-transform shrink-0"
@@ -214,7 +214,7 @@ export default function App() {
 
         {/* Sandbox Status Badge */}
         <div className="bg-white/5 border border-white/10 rounded-xl p-3 text-right">
-          <div className="flex items-center gap-1.5 flex-row-reverse justify-start">
+          <div className="flex items-center gap-1.5 justify-start">
             <span className="w-2 h-2 rounded-full bg-brand-success block animate-pulse"></span>
             <span className="text-[10px] font-bold text-white">اتصال نشط بالـ Sandbox</span>
           </div>
@@ -241,7 +241,7 @@ export default function App() {
                     <button
                       key={item.id}
                       onClick={() => handleNavigate(item.id as ScreenId)}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-all flex-row-reverse text-right cursor-pointer group ${
+                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-all text-right cursor-pointer group ${
                         isActive 
                           ? 'bg-brand-clay text-white shadow-md shadow-brand-clay/10' 
                           : 'text-slate-300 hover:text-white hover:bg-white/5'
@@ -262,7 +262,7 @@ export default function App() {
       {/* Bottom Profile Details Card */}
       <div className="border-t border-white/10 pt-4 space-y-4 text-right">
         {selectedUser ? (
-          <div className="flex items-center gap-3 flex-row-reverse">
+          <div className="flex items-center gap-3">
             {/* Avatar frame */}
             <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-brand-purple to-brand-clay flex items-center justify-center font-bold text-white text-xs border-2 border-white/20">
               {selectedUser.full_name.substring(0, 3)}
@@ -277,7 +277,7 @@ export default function App() {
         )}
 
         {/* Security Indicator */}
-        <div className="flex items-center gap-1.5 flex-row-reverse justify-start text-[9px] text-slate-400 bg-white/5 p-2 rounded-lg">
+        <div className="flex items-center gap-1.5 justify-start text-[9px] text-slate-400 bg-white/5 p-2 rounded-lg">
           <Lock className="w-3 h-3 text-brand-success" />
           <span>البيانات مشفرة ومحمية بالكامل</span>
         </div>
@@ -287,7 +287,7 @@ export default function App() {
   );
 
   return (
-    <div className="min-h-screen bg-brand-bg flex text-right font-sans selection:bg-brand-purple/20 relative overflow-x-hidden">
+    <div className="min-h-screen bg-brand-bg flex text-right font-sans selection:bg-brand-purple/20 relative overflow-x-hidden" dir="rtl">
       
       {/* 1. Desktop Fixed Sidebar */}
       <aside className="hidden lg:flex flex-col w-72 bg-brand-navy text-white h-screen fixed top-0 right-0 z-40 border-l border-white/5 no-print">
@@ -298,10 +298,10 @@ export default function App() {
       <div className="flex-1 flex flex-col lg:mr-72 min-h-screen min-w-0 max-w-full">
         
         {/* Mobile Header (Hidden on Desktop) */}
-        <header className="lg:hidden bg-brand-navy text-white sticky top-0 z-40 shadow-md border-b border-white/5 no-print px-4 h-20 flex flex-row-reverse justify-between items-center">
+        <header className="lg:hidden bg-brand-navy text-white sticky top-0 z-40 shadow-md border-b border-white/5 no-print px-4 h-20 flex justify-between items-center">
           
           {/* Logo brand and name */}
-          <div className="flex items-center gap-3 flex-row-reverse">
+          <div className="flex items-center gap-3">
             <div 
               onClick={() => handleNavigate('landing')}
               className="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-clay to-brand-purple flex items-center justify-center text-white font-black text-lg cursor-pointer"
@@ -332,15 +332,15 @@ export default function App() {
 
         {/* Judges / Evaluators Hackathon Interactive Controller (Sticky under top line, no-print) */}
         <div className="bg-brand-gray border-b border-slate-300 py-3 no-print sticky top-20 lg:top-0 z-30 shadow-inner">
-          <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row-reverse items-center justify-between gap-3">
+          <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-3">
             
-            <div className="flex flex-col md:flex-row-reverse items-center gap-4 w-full md:w-auto">
-              <div className="flex items-center gap-2 flex-row-reverse shrink-0">
+            <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
+              <div className="flex items-center gap-2 shrink-0">
                 <div className="w-2 h-2 rounded-full bg-brand-clay animate-ping"></div>
                 <span className="text-xs font-black text-brand-navy">التحكم التجريبي:</span>
               </div>
               
-              <div className="flex items-center gap-1.5 flex-row-reverse">
+              <div className="flex items-center gap-1.5">
                 <span className="text-[10px] font-bold text-slate-500">المستفيد:</span>
                 <select 
                   value={selectedUserId}
@@ -357,7 +357,7 @@ export default function App() {
             </div>
 
             {/* Scrollable screen buttons list */}
-            <div className="w-full md:w-auto overflow-x-auto whitespace-nowrap py-1 scrollbar-none flex gap-1.5 flex-row-reverse justify-start">
+            <div className="w-full md:w-auto overflow-x-auto whitespace-nowrap py-1 scrollbar-none flex gap-1.5 justify-start">
               {hackathonScreens.map((screen) => (
                 <button
                   key={screen.id}
@@ -476,7 +476,7 @@ export default function App() {
           {/* Drawer Menu */}
           <aside className="relative flex flex-col w-72 bg-brand-navy text-white h-full shadow-2xl z-10 animate-slideInRight">
             {/* Close Button Inside Menu */}
-            <div className="p-4 border-b border-white/10 flex justify-between items-center flex-row-reverse">
+            <div className="p-4 border-b border-white/10 flex justify-between items-center">
               <span className="text-xs font-bold text-slate-400">القائمة الرئيسية</span>
               <button 
                 onClick={() => setMobileMenuOpen(false)}
