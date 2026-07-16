@@ -214,7 +214,7 @@ export default function App() {
   );
 
   return (
-    <div className="min-h-screen bg-brand-bg flex text-right font-sans selection:bg-brand-purple/20 relative">
+    <div className="min-h-screen bg-brand-bg flex text-right font-sans selection:bg-brand-purple/20 relative overflow-x-hidden">
       
       {/* 1. Desktop Fixed Sidebar */}
       <aside className="hidden lg:flex flex-col w-72 bg-brand-navy text-white h-screen fixed top-0 right-0 z-40 border-l border-white/5 no-print">
@@ -222,7 +222,7 @@ export default function App() {
       </aside>
 
       {/* 2. Main Workspace Container */}
-      <div className="flex-1 flex flex-col lg:mr-72 min-h-screen">
+      <div className="flex-1 flex flex-col lg:mr-72 min-h-screen min-w-0 max-w-full">
         
         {/* Mobile Header (Hidden on Desktop) */}
         <header className="lg:hidden bg-brand-navy text-white sticky top-0 z-40 shadow-md border-b border-white/5 no-print px-4 h-20 flex flex-row-reverse justify-between items-center">

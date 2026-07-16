@@ -17,6 +17,12 @@
   --color-brand-danger: #D64545;    /* Alert red */
 }
 
+html, body, #root {
+  min-height: 100vh;
+  min-height: 100dvh;
+  width: 100%;
+}
+
 /* Custom styling to ensure smooth RTL text alignments */
 body {
   font-family: var(--font-sans);
@@ -25,6 +31,7 @@ body {
   direction: rtl;
   text-align: right;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
 
 /* Print utilities for solvency certificate generation */

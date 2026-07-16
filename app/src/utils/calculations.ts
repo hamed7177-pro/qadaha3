@@ -10,7 +10,7 @@ export function calculateStdev(values: number[]): number {
 
 // Default 12-month income data for Fahad (showing realistic freelance fluctuations)
 export const FAHAD_12M_INCOME = [
-  12500, 11000, 9500, 14000, 11800, 10500, 
+  12500, 11000, 9500, 14000, 11800, 10500,
   13200, 8900, 12000, 11500, 14200, 12500
 ];
 
@@ -62,7 +62,7 @@ export function analyzeFinancials(
 
   // Determine prediction status based on ratio, surplus, and volatility
   let prediction: 'Suitable' | 'Caution' | 'NotSuitable' = 'Suitable';
-  
+
   if (obligationToIncomeRatio > 0.45 || finalSurplus < 500) {
     prediction = 'NotSuitable';
   } else if (obligationToIncomeRatio > 0.30 || incomeVolatilityScore > 12 || finalSurplus < 2000) {
@@ -79,7 +79,7 @@ export function analyzeFinancials(
   // Let's assume a confidence value of 0.88 for our model.
   const confidence = 0.88;
   const baseScoreWeight = prediction === 'Suitable' ? 1.0 : prediction === 'Caution' ? 0.5 : 0.0;
-  
+
   const surplusScore = Math.min(Math.max(finalSurplus / 5000, 0), 1);
   const stabilityScoreObj = cashflowStabilityScore / 100;
   const obligationScore = 1 - Math.min(Math.max(obligationToIncomeRatio / 0.6, 0), 1);
