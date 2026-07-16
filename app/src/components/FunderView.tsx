@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Landmark, CheckCircle, ShieldCheck, XCircle, Search, HelpCircle, Lock, AlertCircle, FileText, Calendar, Percent } from 'lucide-react';
-import { ScreenId } from '../types';
+import { ScreenId, UserFinancials } from '../types';
 
 interface FunderViewProps {
   onNavigate: (screenId: ScreenId) => void;
   testedInstallment: number;
   initialVerificationId?: string;
+  financials: UserFinancials | null;
+  loading: boolean;
 }
 
-export default function FunderView({ onNavigate, testedInstallment, initialVerificationId }: FunderViewProps) {
+export default function FunderView({ onNavigate, testedInstallment, initialVerificationId, financials, loading }: FunderViewProps) {
   const [searchId, setSearchId] = useState(initialVerificationId || 'QDH-2026-0182');
   const [isValidated, setIsValidated] = useState(
     initialVerificationId 
@@ -36,6 +38,19 @@ export default function FunderView({ onNavigate, testedInstallment, initialVerif
       setIsValidated(false);
     }
   };
+
+  if (loading || !financials) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[450px] space-y-4">
+        <div className="w-12 h-12 rounded-full border-4 border-brand-purple border-t-transparent animate-spin"></div>
+        <p className="text-sm font-bold text-brand-navy">جاري التحميل والتحقق الآمن من الشهادة...</p>
+      </div>
+    );
+  }
+
+  // Calculate dynamic before/after debt-to-income ratios
+  const currentRatioVal = Math.round((financials.monthlyObligations / financials.avgMonthlyIncome12m) * 100);
+  const afterRatioVal = Math.round(((financials.monthlyObligations + testedInstallment) / financials.avgMonthlyIncome12m) * 100);
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8 space-y-8 text-right">
@@ -119,11 +134,21 @@ export default function FunderView({ onNavigate, testedInstallment, initialVerif
                   <span className="text-xs text-slate-400 font-bold block">مؤشر قدها للملاءة</span>
                   
                   <div className="text-4xl font-black font-mono text-brand-navy">
-                    72 <span className="text-lg text-slate-400">/ 100</span>
+                    {financials.qadahaScore} <span className="text-lg text-slate-400">/ 100</span>
                   </div>
 
-                  <div className="bg-brand-clay/15 text-brand-clay px-3 py-1 rounded-full text-xs font-bold inline-block">
-                    مناسب بحذر
+                  <div className={`px-3 py-1 rounded-full text-xs font-bold inline-block ${
+                    financials.prediction === 'Suitable' 
+                      ? 'bg-brand-success/15 text-brand-success' 
+                      : financials.prediction === 'NotSuitable'
+                      ? 'bg-red-100 text-red-600'
+                      : 'bg-brand-clay/15 text-brand-clay'
+                  }`}>
+                    {financials.prediction === 'Suitable' 
+                      ? 'مناسب للالتزام' 
+                      : financials.prediction === 'NotSuitable'
+                      ? 'غير مناسب للالتزام'
+                      : 'مناسب بحذر'}
                   </div>
                 </div>
 
@@ -147,16 +172,16 @@ export default function FunderView({ onNavigate, testedInstallment, initialVerif
                   
                   <div className="space-y-2">
                     <div className="flex justify-between items-center text-xs">
-                      <span className="font-bold font-mono text-brand-navy">37%</span>
+                      <span className="font-bold font-mono text-brand-navy">{afterRatioVal}%</span>
                       <span className="text-slate-500">نسبة الالتزام الإجمالي للدخل:</span>
                     </div>
                     <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                      <div className="h-full bg-brand-clay rounded-full" style={{ width: '37%' }}></div>
+                      <div className={`h-full rounded-full ${afterRatioVal > 45 ? 'bg-red-500' : afterRatioVal > 33 ? 'bg-brand-clay' : 'bg-brand-success'}`} style={{ width: `${afterRatioVal}%` }}></div>
                     </div>
                   </div>
 
                   <div className="text-[10px] text-slate-400 border-t border-brand-gray pt-1">
-                    نسبة الالتزامات الحالية: 27%
+                    نسبة الالتزامات الحالية: {currentRatioVal}%
                   </div>
                 </div>
 
@@ -168,19 +193,21 @@ export default function FunderView({ onNavigate, testedInstallment, initialVerif
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
                   <div className="flex justify-between p-3 bg-slate-50 rounded-xl">
-                    <span className="font-extrabold font-mono text-brand-navy">11,800 ر.س</span>
+                    <span className="font-extrabold font-mono text-brand-navy">{financials.avgMonthlyIncome12m.toLocaleString()} ر.س</span>
                     <span className="text-slate-500">متوسط الدخل الشهري الفعلي للسنة (12 شهر):</span>
                   </div>
                   <div className="flex justify-between p-3 bg-slate-50 rounded-xl">
-                    <span className="font-extrabold font-mono text-brand-navy">مستوى متوسط (15%)</span>
-                    <span className="text-slate-500">مؤشر تذبذب الدخل الشهري (العمل الحر):</span>
+                    <span className="font-extrabold font-mono text-brand-navy">
+                      {financials.incomeVolatilityScore <= 15 ? 'مستوى منخفض جداً' : financials.incomeVolatilityScore <= 30 ? 'مستوى متوسط' : 'مستوى متذبذب مرتفع'} ({financials.incomeVolatilityScore}%)
+                    </span>
+                    <span className="text-slate-500">مؤشر تذبذب الدخل الشهري:</span>
                   </div>
                   <div className="flex justify-between p-3 bg-slate-50 rounded-xl">
-                    <span className="font-extrabold font-mono text-brand-navy">3,200 ر.س</span>
+                    <span className="font-extrabold font-mono text-brand-navy">{financials.monthlyObligations.toLocaleString()} ر.س</span>
                     <span className="text-slate-500">الالتزامات البنكية والقروض الأخرى القائمة:</span>
                   </div>
                   <div className="flex justify-between p-3 bg-slate-50 rounded-xl">
-                    <span className="font-extrabold font-mono text-brand-navy">3,650 ر.س</span>
+                    <span className="font-extrabold font-mono text-brand-navy">{(financials.avgMonthlyIncome12m - financials.monthlyObligations - testedInstallment - financials.avgMonthlyExpenses).toLocaleString()} ر.س</span>
                     <span className="text-slate-500">متوسط الفائض المالي المتاح شهرياً:</span>
                   </div>
                 </div>

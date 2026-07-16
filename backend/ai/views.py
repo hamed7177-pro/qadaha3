@@ -18,6 +18,15 @@ def predict(request):
             "error": "user_id is required"
         }, status=400)
 
+    installment_str = request.GET.get("installment")
+    if installment_str:
+        try:
+            installment = float(installment_str)
+        except ValueError:
+            installment = 1200.0
+    else:
+        installment = 1200.0
+
     try:
         user = User.objects.get(id=user_id)
         account = BankAccount.objects.get(user=user, is_primary = True)
@@ -37,11 +46,18 @@ def predict(request):
         income=financial_data["avg_income"],
         expenses=financial_data["avg_expenses"],
         obligations=financial_data["avg_obligations"],
-        installment=financial_data["avg_obligations"],
+        installment=installment,
         volatility=financial_data["income_volatility"],
         stability=financial_data["cashflow_stability"],
     )
 
-    result["user"] = user.full_name
+    result["user"] = {
+        "id": user.id,
+        "full_name": user.full_name,
+        "phone": user.phone,
+        "email": user.email,
+        "role": "مصمم مستقل" if user.id == 7 else "موظف قطاع خاص"  # Seeded user role mapping
+    }
+    result["financials"] = financial_data
 
     return Response(result)

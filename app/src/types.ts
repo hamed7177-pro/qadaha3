@@ -44,6 +44,9 @@ export interface UserFinancials {
   riskLevel: 'Low' | 'Medium' | 'High';
   reasons: string[];
   recommendations: string[];
+  monthlyIncomeHistory?: number[];
+  monthlyExpensesHistory?: number[];
+  monthlyObligationsHistory?: number[];
 }
 
 export interface ChatMessage {

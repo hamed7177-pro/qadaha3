@@ -23,6 +23,75 @@ export default function App() {
   const [testedInstallment, setTestedInstallment] = useState<number>(1200);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [initialVerificationId, setInitialVerificationId] = useState<string>('');
+  
+  // Backend connection state variables
+  const [users, setUsers] = useState<any[]>([]);
+  const [selectedUserId, setSelectedUserId] = useState<string>('7'); // Default to Fahad (ID 7)
+  const [financials, setFinancials] = useState<UserFinancials | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  // Fetch list of open banking users from Django Sandbox on mount
+  useEffect(() => {
+    fetch('/api/users/')
+      .then((res) => res.json())
+      .then((data) => {
+        setUsers(data);
+        const hasFahad = data.some((u: any) => u.id === 7);
+        if (hasFahad) {
+          setSelectedUserId('7');
+        } else if (data.length > 0) {
+          setSelectedUserId(data[0].id.toString());
+        }
+      })
+      .catch((err) => console.error('Error fetching users:', err));
+  }, []);
+
+  // Fetch real-time AI ML predictions and cashflow statistics on user or installment change
+  useEffect(() => {
+    if (!selectedUserId) return;
+    setLoading(true);
+    fetch(`/api/predict/?user_id=${selectedUserId}&installment=${testedInstallment}`)
+      .then((res) => res.json())
+      .then((data) => {
+        let prediction: 'Suitable' | 'Caution' | 'NotSuitable' = 'Caution';
+        if (data.prediction === 'Suitable') {
+          prediction = 'Suitable';
+        } else if (data.prediction === 'Not Suitable') {
+          prediction = 'NotSuitable';
+        }
+        
+        let riskLevel: 'Low' | 'Medium' | 'High' = 'Medium';
+        if (data.risk_level.includes('منخفضة')) {
+          riskLevel = 'Low';
+        } else if (data.risk_level.includes('عالية')) {
+          riskLevel = 'High';
+        }
+
+        setFinancials({
+          name: data.user.full_name,
+          role: data.user.role || 'عميل معتمد',
+          avgMonthlyIncome12m: data.financials.avg_income,
+          monthlyObligations: data.financials.avg_obligations,
+          avgMonthlyExpenses: data.financials.avg_expenses,
+          proposedInstallment: testedInstallment,
+          incomeVolatilityScore: data.financials.income_volatility,
+          cashflowStabilityScore: data.financials.cashflow_stability,
+          qadahaScore: data.qadaha_score,
+          prediction: prediction,
+          riskLevel: riskLevel,
+          reasons: data.reasons,
+          recommendations: data.recommendations,
+          monthlyIncomeHistory: data.financials.monthly_income,
+          monthlyExpensesHistory: data.financials.monthly_expenses,
+          monthlyObligationsHistory: data.financials.monthly_obligations,
+        } as any);
+      })
+      .catch((err) => console.error('Error fetching financials:', err))
+      .finally(() => setLoading(false));
+  }, [selectedUserId, testedInstallment]);
+
+  const selectedUser = users.find((u) => u.id.toString() === selectedUserId) || 
+    (selectedUserId === '7' ? { full_name: 'فهد العتيبي', role: 'مصمم مستقل' } : null);
 
   // Parse URL pathname and query parameter on mount/popstate to route accordingly
   useEffect(() => {
@@ -192,16 +261,20 @@ export default function App() {
 
       {/* Bottom Profile Details Card */}
       <div className="border-t border-white/10 pt-4 space-y-4 text-right">
-        <div className="flex items-center gap-3 flex-row-reverse">
-          {/* Avatar frame */}
-          <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-brand-purple to-brand-clay flex items-center justify-center font-bold text-white text-xs border-2 border-white/20">
-            فهد
+        {selectedUser ? (
+          <div className="flex items-center gap-3 flex-row-reverse">
+            {/* Avatar frame */}
+            <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-brand-purple to-brand-clay flex items-center justify-center font-bold text-white text-xs border-2 border-white/20">
+              {selectedUser.full_name.substring(0, 3)}
+            </div>
+            <div>
+              <span className="text-xs font-black text-white block">{selectedUser.full_name}</span>
+              <span className="text-[9px] text-slate-400 block">{selectedUser.role || 'عميل معتمد'}</span>
+            </div>
           </div>
-          <div>
-            <span className="text-xs font-black text-white block">فهد العتيبي</span>
-            <span className="text-[9px] text-slate-400 block">مصمم مستقل • عميل معتمد</span>
-          </div>
-        </div>
+        ) : (
+          <div className="text-xs text-slate-400">جاري تحميل الملف...</div>
+        )}
 
         {/* Security Indicator */}
         <div className="flex items-center gap-1.5 flex-row-reverse justify-start text-[9px] text-slate-400 bg-white/5 p-2 rounded-lg">
@@ -259,15 +332,32 @@ export default function App() {
 
         {/* Judges / Evaluators Hackathon Interactive Controller (Sticky under top line, no-print) */}
         <div className="bg-brand-gray border-b border-slate-300 py-3 no-print sticky top-20 lg:top-0 z-30 shadow-inner">
-          <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row-reverse items-center justify-between gap-3">
+          <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row-reverse items-center justify-between gap-3">
             
-            <div className="flex items-center gap-2 flex-row-reverse shrink-0">
-              <div className="w-2 h-2 rounded-full bg-brand-clay animate-ping"></div>
-              <span className="text-xs font-black text-brand-navy">لوحة تحكيم الهاكاثون (التنقل السريع بين الواجهات الـ 10):</span>
+            <div className="flex flex-col md:flex-row-reverse items-center gap-4 w-full md:w-auto">
+              <div className="flex items-center gap-2 flex-row-reverse shrink-0">
+                <div className="w-2 h-2 rounded-full bg-brand-clay animate-ping"></div>
+                <span className="text-xs font-black text-brand-navy">التحكم التجريبي:</span>
+              </div>
+              
+              <div className="flex items-center gap-1.5 flex-row-reverse">
+                <span className="text-[10px] font-bold text-slate-500">المستفيد:</span>
+                <select 
+                  value={selectedUserId}
+                  onChange={(e) => setSelectedUserId(e.target.value)}
+                  className="px-2.5 py-1.5 text-[10px] font-bold text-brand-navy bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-brand-purple cursor-pointer"
+                >
+                  {users.map((user) => (
+                    <option key={user.id} value={user.id}>
+                      {user.full_name} ({user.id === 7 ? 'عمل حر' : 'موظف'})
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
 
             {/* Scrollable screen buttons list */}
-            <div className="w-full sm:w-auto overflow-x-auto whitespace-nowrap py-1 scrollbar-none flex gap-1.5 flex-row-reverse justify-start">
+            <div className="w-full md:w-auto overflow-x-auto whitespace-nowrap py-1 scrollbar-none flex gap-1.5 flex-row-reverse justify-start">
               {hackathonScreens.map((screen) => (
                 <button
                   key={screen.id}
@@ -298,31 +388,43 @@ export default function App() {
             <ConnectView onNavigate={handleNavigate} />
           )}
           {currentScreen === 'dashboard' && (
-            <DashboardView onNavigate={handleNavigate} />
+            <DashboardView 
+              onNavigate={handleNavigate} 
+              financials={financials}
+              loading={loading}
+            />
           )}
           {currentScreen === 'test_obligation' && (
             <TestObligationView 
               onNavigate={handleNavigate} 
               onUpdateInstallment={setTestedInstallment}
               currentInstallment={testedInstallment}
+              financials={financials}
+              loading={loading}
             />
           )}
           {currentScreen === 'result' && (
             <ResultView 
               onNavigate={handleNavigate} 
               testedInstallment={testedInstallment}
+              financials={financials}
+              loading={loading}
             />
           )}
           {currentScreen === 'certificate' && (
             <CertificateView 
               onNavigate={handleNavigate} 
               testedInstallment={testedInstallment}
+              financials={financials}
+              loading={loading}
             />
           )}
           {currentScreen === 'recommendations' && (
             <RecommendationsView 
               onNavigate={handleNavigate} 
               testedInstallment={testedInstallment}
+              financials={financials}
+              loading={loading}
             />
           )}
           {currentScreen === 'privacy' && (
@@ -333,6 +435,8 @@ export default function App() {
               onNavigate={handleNavigate} 
               testedInstallment={testedInstallment}
               initialVerificationId={initialVerificationId}
+              financials={financials}
+              loading={loading}
             />
           )}
         </main>

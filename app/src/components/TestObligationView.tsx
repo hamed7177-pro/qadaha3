@@ -6,12 +6,16 @@ interface TestObligationViewProps {
   onNavigate: (screenId: ScreenId) => void;
   onUpdateInstallment: (amount: number) => void;
   currentInstallment: number;
+  financials: UserFinancials | null;
+  loading: boolean;
 }
 
 export default function TestObligationView({ 
   onNavigate, 
   onUpdateInstallment,
-  currentInstallment 
+  currentInstallment,
+  financials,
+  loading
 }: TestObligationViewProps) {
   
   const [installment, setInstallment] = useState<number>(currentInstallment);
@@ -20,11 +24,18 @@ export default function TestObligationView({
   const [firstPaymentDate, setFirstPaymentDate] = useState<string>('2026-08-01');
   const [funder, setFunder] = useState<string>('مصرف الإنماء');
 
-  // Hardcoded averages for Fahad's simulation
-  const avgIncome = 11800;
-  const currentObligations = 3200;
+  if (loading || !financials) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[450px] space-y-4">
+        <div className="w-12 h-12 rounded-full border-4 border-brand-purple border-t-transparent animate-spin"></div>
+        <p className="text-sm font-bold text-brand-navy">جاري تحميل وتحليل البيانات المالية من الـ Sandbox...</p>
+      </div>
+    );
+  }
 
-  // Real-time calculated ratios
+  const avgIncome = financials.avgMonthlyIncome12m;
+  const currentObligations = financials.monthlyObligations;
+
   const totalObligationsWithNew = currentObligations + installment;
   const obligationRatio = avgIncome > 0 ? (totalObligationsWithNew / avgIncome) * 100 : 0;
   const originalRatio = (currentObligations / avgIncome) * 100;

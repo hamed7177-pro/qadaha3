@@ -1,51 +1,69 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Sparkles, Send, ArrowRight, ArrowLeft, MessageSquare, Plus, CheckCircle, TrendingUp, AlertCircle, ShieldCheck } from 'lucide-react';
-import { ScreenId, ChatMessage } from '../types';
+import { ScreenId, ChatMessage, UserFinancials } from '../types';
 
 interface RecommendationsViewProps {
   onNavigate: (screenId: ScreenId) => void;
   testedInstallment: number;
+  financials: UserFinancials | null;
+  loading: boolean;
 }
 
-export default function RecommendationsView({ onNavigate, testedInstallment }: RecommendationsViewProps) {
+export default function RecommendationsView({ onNavigate, testedInstallment, financials, loading }: RecommendationsViewProps) {
   
-  // Custom 30/60/90 plan cards
+  if (loading || !financials) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[450px] space-y-4">
+        <div className="w-12 h-12 rounded-full border-4 border-brand-purple border-t-transparent animate-spin"></div>
+        <p className="text-sm font-bold text-brand-navy">جاري تحميل توصيات المستشار المالي المطور بالـ AI...</p>
+      </div>
+    );
+  }
+
+  // Custom 30/60/90 plan cards based on dynamic backend recommendations
+  const dynamicRecs = financials.recommendations || [];
   const steps = [
     {
       days: '30 يوم',
-      title: 'ضغط وتقليل المصاريف المتغيرة',
-      action: 'خفض فوري لمصاريف المعيشة اليومية والمطاعم والترفيه بنسبة 15%.',
-      impact: 'يوفر حوالي 740 ر.س شهرياً فائض إضافي.',
+      title: 'الخطوة العاجلة للأمان',
+      action: dynamicRecs[0] || 'خفض فوري لمصاريف المعيشة المتغيرة بنسبة 15%.',
+      impact: 'يوفر فائض مالي إيجابي لمواجهة التزامات القروض.',
       completed: false,
     },
     {
       days: '60 يوم',
-      title: 'بناء الاحتياطي النقدي (صندوق الطوارئ)',
-      action: 'توفير وادخار فائض مالي تراكمي بقيمة 5,000 ر.س في محفظة طويق الادخارية.',
+      title: 'بناء احتياطي الطوارئ',
+      action: dynamicRecs[1] || 'ادخار فائض مالي لبناء احتياطي طوارئ بقيمة 5,000 ر.س.',
       impact: 'يرفع مؤشر استقرار الرصيد بشكل ملحوظ ويعزز ملاءتك.',
       completed: false,
     },
     {
       days: '90 يوم',
-      title: 'جدولة عقود ومستحقات المشاريع',
-      action: 'تنظيم مواعيد دفعات عملائك المستقلين لتكون دورية في أول كل شهر هجري/ميلادي.',
-      impact: 'يقلل مؤشر تذبذب الدخل إلى الحد الأدنى ويضمن الالتزام بانتظام.',
+      title: 'الاستقرار والتحسين المستدام',
+      action: dynamicRecs[2] || 'تعديل وتخفيض القسط المستهدف ومحاولة تسوية الأقساط القائمة.',
+      impact: 'يقلل مؤشر تذبذب الدخل والمصروف إلى الحد الأدنى ويضمن الالتزام بانتظام.',
       completed: false,
     },
   ];
 
   // Chat with Gemini Integration
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    {
-      id: 'welcome',
-      sender: 'ai',
-      text: 'مرحباً فهد! أنا مستشارك المالي الذكي لـ "قدها". كيف يمكنني مساعدتك اليوم في فهم ملاءتك المالية أو تقديم نصائح لرفع مؤشرك من 72 إلى 81؟',
-      timestamp: new Date().toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }),
-    },
-  ]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+
+  useEffect(() => {
+    if (financials) {
+      setMessages([
+        {
+          id: 'welcome',
+          sender: 'ai',
+          text: `مرحباً ${financials.name.split(' ')[0]}! أنا مستشارك المالي الذكي لـ "قدها". كيف يمكنني مساعدتك اليوم في فهم ملاءتك المالية أو تقديم نصائح لرفع مؤشرك من ${financials.qadahaScore} إلى 90؟`,
+          timestamp: new Date().toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }),
+        }
+      ]);
+    }
+  }, [financials]);
 
   const [input, setInput] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [chatLoading, setChatLoading] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   // Suggested quick questions
@@ -56,7 +74,7 @@ export default function RecommendationsView({ onNavigate, testedInstallment }: R
   ];
 
   const handleSendMessage = async (textToSend: string) => {
-    if (!textToSend.trim() || loading) return;
+    if (!textToSend.trim() || chatLoading) return;
 
     const userMsg: ChatMessage = {
       id: Math.random().toString(),
@@ -67,7 +85,7 @@ export default function RecommendationsView({ onNavigate, testedInstallment }: R
 
     setMessages((prev) => [...prev, userMsg]);
     setInput('');
-    setLoading(true);
+    setChatLoading(true);
 
     try {
       // Call the secure Express backend proxy for Gemini
@@ -94,18 +112,18 @@ export default function RecommendationsView({ onNavigate, testedInstallment }: R
       const aiMsg: ChatMessage = {
         id: Math.random().toString(),
         sender: 'ai',
-        text: 'مرحباً! يبدو أن هناك عطلاً مؤقتاً في الاتصال بالشبكة، ولكن كـ "فهد"، أنصحك بالعمل على بناء احتياطي 5,000 ر.س لتقليل الحذر التمويلي.',
+        text: `مرحباً! يبدو أن هناك عطلاً مؤقتاً في الاتصال بالشبكة، ولكن كـ "${financials.name.split(' ')[0]}"، أنصحك بالعمل على بناء احتياطي 5,000 ر.س لتقليل الحذر التمويلي.`,
         timestamp: new Date().toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }),
       };
       setMessages((prev) => [...prev, aiMsg]);
     } finally {
-      setLoading(false);
+      setChatLoading(false);
     }
   };
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, loading]);
+  }, [messages, chatLoading]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 space-y-8 text-right">
@@ -196,7 +214,7 @@ export default function RecommendationsView({ onNavigate, testedInstallment }: R
             ))}
 
             {/* Simulated Typist loader */}
-            {loading && (
+            {chatLoading && (
               <div className="flex gap-2.5 justify-end flex-row-reverse">
                 <div className="bg-white border border-brand-gray rounded-2xl rounded-tr-none p-3.5 text-xs text-slate-500 shadow-sm">
                   <div className="flex items-center gap-1 justify-center">
@@ -240,8 +258,8 @@ export default function RecommendationsView({ onNavigate, testedInstallment }: R
             />
             <button
               type="submit"
-              disabled={!input.trim() || loading}
-              className={`p-2.5 rounded-xl text-white font-bold transition-all ${input.trim() && !loading ? 'bg-brand-clay hover:bg-brand-clay/90 cursor-pointer' : 'bg-slate-200 text-slate-400 cursor-not-allowed'}`}
+              disabled={!input.trim() || chatLoading}
+              className={`p-2.5 rounded-xl text-white font-bold transition-all ${input.trim() && !chatLoading ? 'bg-brand-clay hover:bg-brand-clay/90 cursor-pointer' : 'bg-slate-200 text-slate-400 cursor-not-allowed'}`}
             >
               <Send className="w-4 h-4 transform rotate-180" />
             </button>

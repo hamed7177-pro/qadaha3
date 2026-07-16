@@ -92,6 +92,24 @@ def calculate_financial_data(account):
         min(100, 100 - round(surplus_std / 100))
     )
 
+    monthly_expenses = []
+    for month in range(1, 13):
+        expense_total = sum(
+            t.amount
+            for t in expenses
+            if t.date.month == month
+        )
+        monthly_expenses.append(expense_total)
+
+    monthly_obligations = []
+    for month in range(1, 13):
+        obligation_total = sum(
+            t.amount
+            for t in obligations
+            if t.date.month == month
+        )
+        monthly_obligations.append(obligation_total)
+
     return {
         "avg_income": avg_income,
         "avg_expenses": avg_expenses,
@@ -100,4 +118,7 @@ def calculate_financial_data(account):
         "obligation_ratio": obligation_ratio,
         "income_volatility": volatility_score,
         "cashflow_stability": cashflow_stability_score,
+        "monthly_income": monthly_income,
+        "monthly_expenses": monthly_expenses,
+        "monthly_obligations": monthly_obligations,
     }

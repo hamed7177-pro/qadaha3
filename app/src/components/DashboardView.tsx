@@ -1,29 +1,37 @@
 import React, { useState } from 'react';
 import { Sparkles, Calendar, ArrowUpRight, TrendingUp, DollarSign, PieChart, ShieldCheck, ChevronLeft, ArrowDownRight, Clock } from 'lucide-react';
-import { ScreenId, Transaction } from '../types';
-import { getMockTransactions, FAHAD_12M_INCOME, FAHAD_12M_EXPENSES, FAHAD_12M_OBLIGATIONS } from '../utils/calculations';
+import { ScreenId, Transaction, UserFinancials } from '../types';
 
 interface DashboardViewProps {
   onNavigate: (screenId: ScreenId) => void;
+  financials: UserFinancials | null;
+  loading: boolean;
 }
 
-export default function DashboardView({ onNavigate }: DashboardViewProps) {
-  const transactions = getMockTransactions();
-  
-  // Hardcoded values for Fahad
-  const avgIncome = 11800;
-  const avgObligations = 3200;
-  const avgExpenses = 4950;
-  const avgSurplus = avgIncome - avgExpenses - avgObligations; // 3,650
-  const balanceStability = 78;
+export default function DashboardView({ onNavigate, financials, loading }: DashboardViewProps) {
+  if (loading || !financials) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[450px] space-y-4">
+        <div className="w-12 h-12 rounded-full border-4 border-brand-purple border-t-transparent animate-spin"></div>
+        <p className="text-sm font-bold text-brand-navy">جاري تحميل وتحليل البيانات المالية من الـ Sandbox...</p>
+      </div>
+    );
+  }
 
-  // Expenses categories for Fahad's donut chart
+  // Get values dynamically from the backend financials payload
+  const avgIncome = financials.avgMonthlyIncome12m;
+  const avgObligations = financials.monthlyObligations;
+  const avgExpenses = financials.avgMonthlyExpenses;
+  const avgSurplus = avgIncome - avgExpenses - avgObligations;
+  const balanceStability = financials.incomeVolatilityScore; // stability mapping
+
+  // Expenses categories proportional to user's average expenses
   const categories = [
-    { name: 'سكن وفواتير', value: 2100, color: '#071B33', percentage: '42%' },
-    { name: 'معيشة ومطاعم', value: 1350, color: '#C86B4F', percentage: '27%' },
-    { name: 'أدوات برمجية ومشاريع', value: 800, color: '#8F8BEA', percentage: '16%' },
-    { name: 'مواصلات وبنزين', value: 450, color: '#2BB673', percentage: '9%' },
-    { name: 'اشتراكات وخدمات', value: 250, color: '#24234F', percentage: '6%' },
+    { name: 'سكن وفواتير', value: Math.round(avgExpenses * 0.42), color: '#071B33', percentage: '42%' },
+    { name: 'معيشة ومطاعم', value: Math.round(avgExpenses * 0.27), color: '#C86B4F', percentage: '27%' },
+    { name: 'أدوات برمجية ومشاريع', value: Math.round(avgExpenses * 0.16), color: '#8F8BEA', percentage: '16%' },
+    { name: 'مواصلات وبنزين', value: Math.round(avgExpenses * 0.09), color: '#2BB673', percentage: '9%' },
+    { name: 'اشتراكات وخدمات', value: Math.round(avgExpenses * 0.06), color: '#24234F', percentage: '6%' },
   ];
 
   // 12-Month names
@@ -34,14 +42,15 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
   const height = 200;
   const padding = 30;
 
-  // Generate points for the line graph based on 12 months income
-  const maxIncome = Math.max(...FAHAD_12M_INCOME);
-  const minIncome = Math.min(...FAHAD_12M_INCOME);
+  // Use the monthly history from backend or fallback to static
+  const monthlyIncome = financials.monthlyIncomeHistory || [11800, 11800, 11800, 11800, 11800, 11800, 11800, 11800, 11800, 11800, 11800, 11800];
+  const maxIncome = Math.max(...monthlyIncome);
+  const minIncome = Math.min(...monthlyIncome);
   
-  const points = FAHAD_12M_INCOME.map((val, idx) => {
-    const x = padding + (idx * (width - padding * 2)) / (FAHAD_12M_INCOME.length - 1);
-    // Scale y coordinate
-    const y = height - padding - ((val - 6000) * (height - padding * 2)) / (16000 - 6000);
+  const points = monthlyIncome.map((val, idx) => {
+    const x = padding + (idx * (width - padding * 2)) / (monthlyIncome.length - 1);
+    const range = maxIncome - minIncome || 1000;
+    const y = height - padding - ((val - (minIncome - range * 0.1)) * (height - padding * 2)) / (range * 1.2);
     return { x, y, value: val, month: monthLabels[idx] };
   });
 
@@ -59,7 +68,7 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
             <Sparkles className="w-3.5 h-3.5" />
             <span>بيانات المصرفية المفتوحة نشطة</span>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-extrabold">مرحباً فهد، هذه صورة مختصرة عن قدرتك المالية</h2>
+          <h2 className="text-2xl sm:text-3xl font-extrabold">مرحباً {financials.name.split(' ')[0]}، هذه صورة مختصرة عن قدرتك المالية</h2>
           <p className="text-xs sm:text-sm text-white/75">
             لقد تم تحليل كشف حسابك البنكي على مدار <span className="font-bold text-brand-clay">12 شهراً</span> بنجاح. بياناتك آمنة بموجب معايير البنك المركزي السعودي.
           </p>
@@ -81,34 +90,34 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
         <div className="bg-white rounded-2xl p-6 border border-brand-gray shadow-sm space-y-3">
           <span className="text-xs text-slate-400 font-bold block">متوسط الدخل الشهري (12 شهر)</span>
           <div className="flex justify-between items-baseline flex-row-reverse">
-            <span className="text-2xl font-black text-brand-navy font-mono">11,800 ر.س</span>
+            <span className="text-2xl font-black text-brand-navy font-mono">{avgIncome.toLocaleString()} ر.س</span>
             <span className="text-xs text-brand-success font-bold flex items-center gap-0.5">
               <ArrowUpRight className="w-3 h-3" />
-              <span>مستقر</span>
+              <span>{financials.incomeVolatilityScore <= 15 ? 'مستقر' : 'متذبذب'}</span>
             </span>
           </div>
-          <p className="text-[10px] text-slate-500">متذبذب جزئياً بسبب طبيعة العمل الحر والعملاء</p>
+          <p className="text-[10px] text-slate-500">مبني على التدفقات الفعلية المودعة بالحساب</p>
         </div>
 
         {/* Metric 2 */}
         <div className="bg-white rounded-2xl p-6 border border-brand-gray shadow-sm space-y-3">
           <span className="text-xs text-slate-400 font-bold block">الالتزامات البنكية القائمة</span>
           <div className="flex justify-between items-baseline flex-row-reverse">
-            <span className="text-2xl font-black text-brand-navy font-mono">3,200 ر.س</span>
+            <span className="text-2xl font-black text-brand-navy font-mono">{avgObligations.toLocaleString()} ر.س</span>
             <span className="text-xs text-brand-clay font-bold flex items-center gap-0.5">
-              <span>27% من الدخل</span>
+              <span>{((avgObligations / avgIncome) * 100).toFixed(0)}% من الدخل</span>
             </span>
           </div>
-          <p className="text-[10px] text-slate-500">تمويل سيارة تأجيري جاري لدى بنك الإنماء</p>
+          <p className="text-[10px] text-slate-500">إجمالي الاستقطاعات والالتزامات النشطة حالياً</p>
         </div>
 
         {/* Metric 3 */}
         <div className="bg-white rounded-2xl p-6 border border-brand-gray shadow-sm space-y-3">
           <span className="text-xs text-slate-400 font-bold block">الفائض المالي الشهري المتاح</span>
           <div className="flex justify-between items-baseline flex-row-reverse">
-            <span className="text-2xl font-black text-brand-navy font-mono">3,650 ر.س</span>
+            <span className="text-2xl font-black text-brand-navy font-mono">{avgSurplus.toLocaleString()} ر.س</span>
             <span className="text-xs text-brand-success font-bold flex items-center gap-0.5">
-              <span>إيجابي</span>
+              <span>{avgSurplus > 0 ? 'إيجابي' : 'سلبي'}</span>
             </span>
           </div>
           <p className="text-[10px] text-slate-500">بعد خصم المصاريف المعيشية المتغيرة والالتزامات</p>
@@ -118,10 +127,12 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
         <div className="bg-white rounded-2xl p-6 border border-brand-gray shadow-sm space-y-3">
           <span className="text-xs text-slate-400 font-bold block">مؤشر استقرار التدفق النقدي</span>
           <div className="flex justify-between items-baseline flex-row-reverse">
-            <span className="text-2xl font-black text-brand-navy font-mono">78%</span>
-            <span className="text-xs text-brand-purple font-bold">ملاءة جيدة</span>
+            <span className="text-2xl font-black text-brand-navy font-mono">{balanceStability}%</span>
+            <span className="text-xs text-brand-purple font-bold">
+              {balanceStability >= 75 ? 'ملاءة ممتازة' : balanceStability >= 50 ? 'ملاءة جيدة' : 'ملاءة بحذر'}
+            </span>
           </div>
-          <p className="text-[10px] text-slate-500">يعبر عن مدى انتظام الدخل الشهري طوال العام</p>
+          <p className="text-[10px] text-slate-500">يعبر عن مدى انتظام واستقرار الرصيد طوال العام</p>
         </div>
 
       </div>
@@ -134,7 +145,7 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
           <div className="flex justify-between items-center flex-row-reverse">
             <div>
               <h3 className="text-lg font-bold text-brand-navy">منحنى التدفق النقدي الوارد (السنة الماضية)</h3>
-              <p className="text-xs text-slate-400">تغير ومحاكاة الدخل الشهري الفعلي لفهد على مدار 12 شهراً</p>
+              <p className="text-xs text-slate-400">تغير ومحاكاة الدخل الشهري الفعلي لـ {financials.name.split(' ')[0]} على مدار 12 شهراً</p>
             </div>
             <div className="flex items-center gap-1 text-xs text-slate-500">
               <span className="w-2.5 h-2.5 rounded-full bg-brand-clay block"></span>
@@ -238,8 +249,6 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
             {/* Pure SVG Donut Chart */}
             <div className="relative w-36 h-36 flex items-center justify-center">
               <svg width="140" height="140" viewBox="0 0 140 140" className="transform -rotate-90">
-                {/* Categorized Slices (rough calculation representation) */}
-                {/* Total variable: 4700 SAR */}
                 <circle cx="70" cy="70" r="50" fill="none" stroke="#EEF1F4" strokeWidth="16" />
                 
                 {/* Segment 1: Housing SA93 (42%) */}
@@ -257,7 +266,7 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
               
               <div className="absolute text-center">
                 <span className="text-xs text-slate-400 block">إجمالي الصرف</span>
-                <span className="text-sm font-black font-mono text-brand-navy">4,950 ر.س</span>
+                <span className="text-sm font-black font-mono text-brand-navy">{avgExpenses.toLocaleString()} ر.س</span>
               </div>
             </div>
 
@@ -294,12 +303,12 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
                 <Calendar className="w-5 h-5" />
               </div>
               <div>
-                <h4 className="text-sm font-bold text-brand-navy">تمويل سيارة تأجيري شهري</h4>
-                <p className="text-[10px] text-slate-400">مصرف الإنماء السعودي • استقطاع تلقائي</p>
+                <h4 className="text-sm font-bold text-brand-navy">تمويل شخصي / التزامات قائمة</h4>
+                <p className="text-[10px] text-slate-400">حسم مباشر من الرصيد • استقطاع تلقائي</p>
               </div>
             </div>
             <div className="text-left font-mono">
-              <span className="text-sm font-black block text-brand-navy">3,200 ر.س</span>
+              <span className="text-sm font-black block text-brand-navy">{(avgObligations > 250 ? avgObligations - 250 : avgObligations).toLocaleString()} ر.س</span>
               <span className="text-[10px] text-slate-400 block">يوم 27 من كل شهر</span>
             </div>
           </div>
@@ -315,7 +324,7 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
               </div>
             </div>
             <div className="text-left font-mono">
-              <span className="text-sm font-black block text-brand-navy">250 ر.س</span>
+              <span className="text-sm font-black block text-brand-navy">{(avgObligations > 250 ? 250 : 0).toLocaleString()} ر.س</span>
               <span className="text-[10px] text-slate-400 block">متوسط صرف متكرر</span>
             </div>
           </div>

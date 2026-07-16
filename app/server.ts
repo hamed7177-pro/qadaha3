@@ -114,6 +114,36 @@ app.post('/api/gemini/chat', async (req, res) => {
   }
 });
 
+// Proxy all other /api/* requests to Django backend on http://127.0.0.1:8000
+app.all('/api/*', async (req, res, next) => {
+  if (req.path === '/api/gemini/chat' || req.path === '/api/health') {
+    return next();
+  }
+
+  const djangoUrl = `http://127.0.0.1:8000${req.originalUrl}`;
+  try {
+    const response = await fetch(djangoUrl, {
+      method: req.method,
+      headers: {
+        'Content-Type': req.headers['content-type'] || 'application/json',
+      },
+      body: req.method !== 'GET' && req.method !== 'HEAD' ? JSON.stringify(req.body) : undefined,
+    });
+    
+    const contentType = response.headers.get('content-type');
+    if (contentType && contentType.includes('application/json')) {
+      const data = await response.json();
+      res.status(response.status).json(data);
+    } else {
+      const text = await response.text();
+      res.status(response.status).send(text);
+    }
+  } catch (error) {
+    console.error(`Error proxying to Django (${djangoUrl}):`, error);
+    res.status(502).json({ error: 'Failed to communicate with Django backend' });
+  }
+});
+
 // Health check endpoint
 app.get('/api/health', (req, res) => {
   res.json({ status: 'healthy', time: new Date() });

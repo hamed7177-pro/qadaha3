@@ -6,15 +6,19 @@ import { analyzeFinancials, FAHAD_12M_INCOME, FAHAD_12M_EXPENSES, FAHAD_12M_OBLI
 interface CertificateViewProps {
   onNavigate: (screenId: ScreenId) => void;
   testedInstallment: number;
+  financials: UserFinancials | null;
+  loading: boolean;
 }
 
-export default function CertificateView({ onNavigate, testedInstallment }: CertificateViewProps) {
-  const financials = analyzeFinancials(
-    FAHAD_12M_INCOME,
-    FAHAD_12M_EXPENSES,
-    FAHAD_12M_OBLIGATIONS,
-    testedInstallment
-  );
+export default function CertificateView({ onNavigate, testedInstallment, financials, loading }: CertificateViewProps) {
+  if (loading || !financials) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[450px] space-y-4">
+        <div className="w-12 h-12 rounded-full border-4 border-brand-purple border-t-transparent animate-spin"></div>
+        <p className="text-sm font-bold text-brand-navy">جاري توليد شهادة الملاءة المعتمدة...</p>
+      </div>
+    );
+  }
 
   const [copied, setCopied] = useState(false);
   const [downloading, setDownloading] = useState(false);
@@ -100,13 +104,32 @@ export default function CertificateView({ onNavigate, testedInstallment }: Certi
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-brand-bg/60 p-4 rounded-2xl border border-brand-gray">
             <div className="space-y-1 text-right">
               <span className="text-[10px] text-slate-400 font-bold">اسم المستفيد الأول (محمي):</span>
-              <span className="text-sm font-extrabold text-brand-navy block">فـ**ـد (مصمم مستقل)</span>
+              <span className="text-sm font-extrabold text-brand-navy block">{financials.name.split(' ')[0]}ـ** ({financials.role})</span>
             </div>
             <div className="space-y-1 text-right">
               <span className="text-[10px] text-slate-400 font-bold">حالة الملاءة التقديرية للطلب:</span>
-              <span className="text-sm font-extrabold text-brand-clay block flex items-center gap-1.5 justify-end">
-                <span className="w-2 h-2 rounded-full bg-brand-clay block"></span>
-                <span>مناسب بحذر (مؤشر: {financials.qadahaScore}/100)</span>
+              <span className={`text-sm font-extrabold block flex items-center gap-1.5 justify-end ${
+                financials.prediction === 'Suitable' 
+                  ? 'text-brand-success' 
+                  : financials.prediction === 'NotSuitable'
+                  ? 'text-red-600'
+                  : 'text-brand-clay'
+              }`}>
+                <span className={`w-2 h-2 rounded-full block ${
+                  financials.prediction === 'Suitable' 
+                    ? 'bg-brand-success' 
+                    : financials.prediction === 'NotSuitable'
+                    ? 'bg-red-500'
+                    : 'bg-brand-clay'
+                }`}></span>
+                <span>
+                  {financials.prediction === 'Suitable' 
+                    ? 'مناسب للالتزام' 
+                    : financials.prediction === 'NotSuitable'
+                    ? 'غير مناسب للالتزام'
+                    : 'مناسب بحذر'}{' '}
+                  (مؤشر: {financials.qadahaScore}/100)
+                </span>
               </span>
             </div>
           </div>
@@ -120,13 +143,13 @@ export default function CertificateView({ onNavigate, testedInstallment }: Certi
               {/* average monthly income */}
               <div className="flex justify-between items-center border-b border-dashed border-slate-200 pb-2">
                 <span className="text-slate-500">متوسط الدخل الشهري الفعلي لمدة سنة (12 شهر):</span>
-                <span className="font-extrabold font-mono text-brand-navy">11,800 ر.س</span>
+                <span className="font-extrabold font-mono text-brand-navy">{financials.avgMonthlyIncome12m.toLocaleString()} ر.س</span>
               </div>
 
               {/* obligations */}
               <div className="flex justify-between items-center border-b border-dashed border-slate-200 pb-2">
                 <span className="text-slate-500">الالتزامات البنكية والقروض الأخرى القائمة:</span>
-                <span className="font-extrabold font-mono text-brand-navy">3,200 ر.س</span>
+                <span className="font-extrabold font-mono text-brand-navy">{financials.monthlyObligations.toLocaleString()} ر.س</span>
               </div>
 
               {/* tested installment */}
@@ -138,13 +161,15 @@ export default function CertificateView({ onNavigate, testedInstallment }: Certi
               {/* surplus */}
               <div className="flex justify-between items-center border-b border-dashed border-slate-200 pb-2">
                 <span className="text-slate-500">متوسط الفائض المالي المتاح شهرياً:</span>
-                <span className="font-extrabold font-mono text-brand-navy">{financials.avgMonthlyExpenses ? (11800 - 3200 - testedInstallment - 4950).toLocaleString() : '3,650'} ر.س</span>
+                <span className="font-extrabold font-mono text-brand-navy">{(financials.avgMonthlyIncome12m - financials.monthlyObligations - testedInstallment - financials.avgMonthlyExpenses).toLocaleString()} ر.س</span>
               </div>
 
               {/* volatility index */}
               <div className="flex justify-between items-center border-b border-dashed border-slate-200 pb-2 md:col-span-2">
-                <span className="text-slate-500">مؤشر تذبذب الدخل الشهري (العمل الحر):</span>
-                <span className="font-bold text-brand-navy">مستوى متوسط ({financials.incomeVolatilityScore}%) • تذبذب اعتيادي للمستقلين</span>
+                <span className="text-slate-500">مؤشر تذبذب الدخل الشهري:</span>
+                <span className="font-bold text-brand-navy">
+                  {financials.incomeVolatilityScore <= 15 ? 'مستوى منخفض جداً' : financials.incomeVolatilityScore <= 30 ? 'مستوى متوسط' : 'مستوى متذبذب مرتفع'} ({financials.incomeVolatilityScore}%)
+                </span>
               </div>
 
             </div>

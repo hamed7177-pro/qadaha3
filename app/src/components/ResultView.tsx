@@ -6,24 +6,35 @@ import { analyzeFinancials, FAHAD_12M_INCOME, FAHAD_12M_EXPENSES, FAHAD_12M_OBLI
 interface ResultViewProps {
   onNavigate: (screenId: ScreenId) => void;
   testedInstallment: number;
+  financials: UserFinancials | null;
+  loading: boolean;
 }
 
-export default function ResultView({ onNavigate, testedInstallment }: ResultViewProps) {
-  // Use our real utility calculations
-  const financials = analyzeFinancials(
-    FAHAD_12M_INCOME,
-    FAHAD_12M_EXPENSES,
-    FAHAD_12M_OBLIGATIONS,
-    testedInstallment
-  );
+export default function ResultView({ onNavigate, testedInstallment, financials, loading }: ResultViewProps) {
+  if (loading || !financials) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[450px] space-y-4">
+        <div className="w-12 h-12 rounded-full border-4 border-brand-purple border-t-transparent animate-spin"></div>
+        <p className="text-sm font-bold text-brand-navy">جاري تحليل الملاءة وحساب النتيجة بالـ AI...</p>
+      </div>
+    );
+  }
 
-  // Exact breakdowns requested
+  // Calculate dynamic before/after debt-to-income ratios
+  const currentRatioVal = Math.round((financials.monthlyObligations / financials.avgMonthlyIncome12m) * 100);
+  const afterRatioVal = Math.round(((financials.monthlyObligations + testedInstallment) / financials.avgMonthlyIncome12m) * 100);
+
+  // Dynamic breakdown values mapped to database Open Banking attributes
+  const stabilityScore = financials.cashflowStabilityScore;
+  const volatilityScore = financials.incomeVolatilityScore;
+  const dti = (financials.monthlyObligations / financials.avgMonthlyIncome12m) * 100;
+  
   const breakdowns = [
-    { name: 'انتظام واستقرار الدخل', score: 18, total: 25, percentage: '72%' },
-    { name: 'نسبة الالتزامات للدخل', score: 20, total: 25, percentage: '80%' },
-    { name: 'الفائض النقدي المتاح', score: 14, total: 20, percentage: '70%' },
-    { name: 'استقرار متوسط الرصيد', score: 12, total: 20, percentage: '60%' },
-    { name: 'سلوك الإنفاق والادخار', score: 8, total: 10, percentage: '80%' },
+    { name: 'انتظام واستقرار الدخل', score: Math.round(25 * (stabilityScore / 100)), total: 25, percentage: `${stabilityScore}%` },
+    { name: 'نسبة الالتزامات للدخل', score: Math.max(0, Math.round(25 * (1 - dti / 100))), total: 25, percentage: `${Math.max(0, Math.round(100 - dti))}%` },
+    { name: 'الفائض النقدي المتاح', score: Math.round(20 * (financials.qadahaScore / 100)), total: 20, percentage: `${financials.qadahaScore}%` },
+    { name: 'استقرار متوسط الرصيد', score: Math.round(20 * (1 - volatilityScore / 100)), total: 20, percentage: `${Math.round(100 - volatilityScore)}%` },
+    { name: 'سلوك الإنفاق والادخار', score: Math.round(10 * (financials.qadahaScore / 100)), total: 10, percentage: `${financials.qadahaScore}%` },
   ];
 
   return (
@@ -98,13 +109,31 @@ export default function ResultView({ onNavigate, testedInstallment }: ResultView
 
           {/* Solvency Status Alert */}
           <div className="space-y-2">
-            <div className="bg-brand-clay/10 border border-brand-clay/20 text-brand-clay px-5 py-2.5 rounded-2xl text-base font-extrabold inline-flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-brand-clay block animate-pulse"></span>
-              <span>مناسب بحذر</span>
+            <div className={`border px-5 py-2.5 rounded-2xl text-base font-extrabold inline-flex items-center gap-2 ${
+              financials.prediction === 'Suitable' 
+                ? 'bg-brand-success/10 border-brand-success/20 text-brand-success' 
+                : financials.prediction === 'NotSuitable'
+                ? 'bg-red-50 border-red-100 text-red-600'
+                : 'bg-brand-clay/10 border-brand-clay/20 text-brand-clay'
+            }`}>
+              <span className={`w-2.5 h-2.5 rounded-full block animate-pulse ${
+                financials.prediction === 'Suitable' 
+                  ? 'bg-brand-success' 
+                  : financials.prediction === 'NotSuitable'
+                  ? 'bg-red-500'
+                  : 'bg-brand-clay'
+              }`}></span>
+              <span>
+                {financials.prediction === 'Suitable' 
+                  ? 'مناسب للالتزام' 
+                  : financials.prediction === 'NotSuitable'
+                  ? 'غير مناسب للالتزام'
+                  : 'مناسب بحذر'}
+              </span>
             </div>
             
             <p className="text-xs sm:text-sm text-slate-600 leading-relaxed px-2">
-              دخلك جيد، لكن تذبذب الدخل وارتفاع الالتزامات يجعلان القسط المقترح بحاجة إلى حذر.
+              {financials.reasons.join(' ')}
             </p>
           </div>
 
@@ -119,11 +148,11 @@ export default function ResultView({ onNavigate, testedInstallment }: ResultView
               {/* Before */}
               <div className="space-y-1">
                 <div className="flex justify-between text-[11px]">
-                  <span className="text-slate-500 font-medium">الوضع الحالي لـ فهد</span>
-                  <span className="text-brand-success font-bold">27%</span>
+                  <span className="text-slate-500 font-medium">الوضع الحالي لـ {financials.name}</span>
+                  <span className="text-brand-success font-bold">{currentRatioVal}%</span>
                 </div>
                 <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden">
-                  <div className="h-full bg-brand-success rounded-full" style={{ width: '27%' }}></div>
+                  <div className="h-full bg-brand-success rounded-full" style={{ width: `${currentRatioVal}%` }}></div>
                 </div>
               </div>
 
@@ -131,10 +160,10 @@ export default function ResultView({ onNavigate, testedInstallment }: ResultView
               <div className="space-y-1">
                 <div className="flex justify-between text-[11px]">
                   <span className="text-slate-500 font-medium">بعد التزام {testedInstallment.toLocaleString()} ر.س</span>
-                  <span className="text-brand-clay font-bold">37%</span>
+                  <span className={`font-bold ${afterRatioVal > 45 ? 'text-red-600' : afterRatioVal > 33 ? 'text-brand-clay' : 'text-brand-success'}`}>{afterRatioVal}%</span>
                 </div>
                 <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden">
-                  <div className="h-full bg-brand-clay rounded-full" style={{ width: '37%' }}></div>
+                  <div className={`h-full rounded-full ${afterRatioVal > 45 ? 'bg-red-500' : afterRatioVal > 33 ? 'bg-brand-clay' : 'bg-brand-success'}`} style={{ width: `${afterRatioVal}%` }}></div>
                 </div>
               </div>
             </div>

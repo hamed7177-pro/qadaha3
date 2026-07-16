@@ -1,6 +1,6 @@
 import { UserFinancials, Transaction } from '../types';
 
-// Helper to calculate standard deviation
+// Helper to calculate stan00dard deviation
 export function calculateStdev(values: number[]): number {
   if (values.length <= 1) return 0;
   const mean = values.reduce((sum, v) => sum + v, 0) / values.length;
