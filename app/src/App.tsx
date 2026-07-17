@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  ShieldCheck, Landmark, Lock, Menu, X, ArrowLeftRight, HelpCircle, 
-  ChevronLeft, CreditCard, Sparkles, Home, LayoutDashboard, Link2, 
-  Calculator, Award, MessageSquare, LogOut, Check 
+import {
+  ShieldCheck, Landmark, Lock, Menu, X, ArrowLeftRight, HelpCircle,
+  ChevronLeft, CreditCard, Sparkles, Home, LayoutDashboard, Link2,
+  Calculator, Award, MessageSquare, LogOut, Check
 } from 'lucide-react';
 import { ScreenId, Certificate, UserFinancials } from './types';
 
@@ -23,7 +23,7 @@ export default function App() {
   const [testedInstallment, setTestedInstallment] = useState<number>(1200);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [initialVerificationId, setInitialVerificationId] = useState<string>('');
-  
+
   // Backend connection state variables
   const [users, setUsers] = useState<any[]>([]);
   const [selectedUserId, setSelectedUserId] = useState<string>('7'); // Default to Fahad (ID 7)
@@ -36,16 +36,16 @@ export default function App() {
     if (financials) {
       const today = new Date();
       const issueStr = today.toISOString().split('T')[0];
-      
+
       const expiry = new Date(today);
       expiry.setMonth(today.getMonth() + 1);
       const expiryStr = expiry.toISOString().split('T')[0];
-      
+
       // Verification ID format: QDH-YYYY-XXXX
       const year = today.getFullYear();
       const uniqueCode = String((selectedUserId.charCodeAt(0) * 100 + Math.round(testedInstallment) % 1000)).padStart(4, '0');
       const verificationId = `QDH-${year}-${uniqueCode}`;
-      
+
       setCertificate({
         verificationId,
         issueDate: issueStr,
@@ -56,6 +56,7 @@ export default function App() {
       setCertificate(null);
     }
   }, [financials, selectedUserId, testedInstallment]);
+
 
   const API_BASE_URL = 'https://qadaha3-one.vercel.app';
 
@@ -102,7 +103,7 @@ export default function App() {
         } else if (data.prediction === 'Not Suitable') {
           prediction = 'NotSuitable';
         }
-        
+
         let riskLevel: 'Low' | 'Medium' | 'High' = 'Medium';
         if (data.risk_level.includes('منخفضة')) {
           riskLevel = 'Low';
@@ -163,7 +164,7 @@ export default function App() {
       .finally(() => setLoading(false));
   }, [selectedUserId, testedInstallment]);
 
-  const selectedUser = users.find((u) => u.id.toString() === selectedUserId) || 
+  const selectedUser = users.find((u) => u.id.toString() === selectedUserId) ||
     (selectedUserId === '7' ? { full_name: 'فهد العتيبي', role: 'مصمم مستقل' } : null);
 
   // Parse URL pathname and query parameter on mount/popstate to route accordingly
@@ -172,23 +173,23 @@ export default function App() {
       const path = window.location.pathname.replace(/^\//, '') || 'landing';
       const params = new URLSearchParams(window.location.search);
       const verificationId = params.get('verificationId');
-      
+
       const validScreens: ScreenId[] = [
-        'landing', 'consent', 'connect', 'dashboard', 
-        'test_obligation', 'result', 'certificate', 
+        'landing', 'consent', 'connect', 'dashboard',
+        'test_obligation', 'result', 'certificate',
         'recommendations', 'privacy', 'funder'
       ];
-      
+
       let targetScreen: ScreenId = 'landing';
       if (validScreens.includes(path as ScreenId)) {
         targetScreen = path as ScreenId;
       }
-      
+
       if (verificationId) {
         setInitialVerificationId(verificationId);
         targetScreen = 'funder';
       }
-      
+
       setCurrentScreen(targetScreen);
     };
 
@@ -255,11 +256,11 @@ export default function App() {
   const handleNavigate = (screenId: ScreenId) => {
     const path = `/${screenId}`;
     let search = '';
-    
+
     if (screenId === 'funder' && initialVerificationId) {
       search = `?verificationId=${initialVerificationId}`;
     }
-    
+
     window.history.pushState(null, '', `${path}${search}`);
     setCurrentScreen(screenId);
     setMobileMenuOpen(false);
@@ -267,13 +268,13 @@ export default function App() {
 
   const SidebarContent = () => (
     <div className="flex flex-col h-full justify-between p-6">
-      
+
       {/* Top Sidebar Body */}
       <div className="space-y-8">
-        
+
         {/* Brand Logo & Name */}
         <div className="flex items-center gap-3">
-          <div 
+          <div
             onClick={() => handleNavigate('landing')}
             className="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-clay to-brand-purple flex items-center justify-center text-white font-black text-lg cursor-pointer hover:scale-105 transition-transform shrink-0"
           >
@@ -303,22 +304,21 @@ export default function App() {
               <h3 className="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider pr-1">
                 {group.title}
               </h3>
-              
+
               <div className="space-y-1">
                 {group.items.map((item) => {
                   const IconComponent = item.icon;
-                  const isActive = currentScreen === item.id || 
+                  const isActive = currentScreen === item.id ||
                     (item.id === 'consent' && currentScreen === 'connect');
-                  
+
                   return (
                     <button
                       key={item.id}
                       onClick={() => handleNavigate(item.id as ScreenId)}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-all text-right cursor-pointer group ${
-                        isActive 
-                          ? 'bg-brand-clay text-white shadow-md shadow-brand-clay/10' 
+                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-all text-right cursor-pointer group ${isActive
+                          ? 'bg-brand-clay text-white shadow-md shadow-brand-clay/10'
                           : 'text-slate-300 hover:text-white hover:bg-white/5'
-                      }`}
+                        }`}
                     >
                       <IconComponent className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : 'text-slate-400 group-hover:text-white'}`} />
                       <span className="flex-1 truncate">{item.label}</span>
@@ -365,25 +365,25 @@ export default function App() {
       <div className="min-h-screen bg-brand-navy flex flex-col items-center justify-center text-center p-6 text-white relative overflow-hidden" dir="rtl">
         {/* Background glow */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(143,139,234,0.08)_0,transparent_100%)]"></div>
-        
+
         <div className="space-y-8 max-w-md w-full relative z-10">
           {/* Logo Icon */}
           <div className="w-20 h-20 mx-auto rounded-3xl bg-gradient-to-tr from-brand-clay to-brand-purple flex items-center justify-center text-white font-black text-4xl shadow-xl shadow-brand-purple/25 animate-pulse">
             ق
           </div>
-          
+
           {/* Text Info */}
           <div className="space-y-3">
             <h2 className="text-2xl font-black tracking-tight text-white">منصة قدها للملاءة المالية</h2>
             <p className="text-xs text-slate-300">جاري الاتصال بالـ Open Banking Sandbox وتحميل المؤشرات المالية...</p>
           </div>
-          
+
           {/* Progress / Loading indicator */}
           <div className="space-y-4">
             <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden relative">
               <div className="absolute top-0 right-0 bottom-0 bg-gradient-to-l from-brand-clay to-brand-purple w-1/2 rounded-full animate-loading-bar"></div>
             </div>
-            
+
             <div className="flex justify-between text-[10px] text-slate-400 font-mono">
               <span>SAMA Open Banking API v1.0</span>
               <span>جاري التحميل...</span>
@@ -396,7 +396,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-brand-bg flex text-right font-sans selection:bg-brand-purple/20 relative overflow-x-hidden" dir="rtl">
-      
+
       {/* 1. Desktop Fixed Sidebar */}
       <aside className="hidden lg:flex flex-col w-72 bg-brand-navy text-white h-screen fixed top-0 right-0 z-40 border-l border-white/5 no-print">
         <SidebarContent />
@@ -404,13 +404,13 @@ export default function App() {
 
       {/* 2. Main Workspace Container */}
       <div className="flex-1 flex flex-col lg:mr-72 min-h-screen min-w-0 max-w-full">
-        
+
         {/* Mobile Header (Hidden on Desktop) */}
         <header className="lg:hidden bg-brand-navy text-white sticky top-0 z-40 shadow-md border-b border-white/5 no-print px-4 h-20 flex justify-between items-center">
-          
+
           {/* Logo brand and name */}
           <div className="flex items-center gap-3">
-            <div 
+            <div
               onClick={() => handleNavigate('landing')}
               className="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-clay to-brand-purple flex items-center justify-center text-white font-black text-lg cursor-pointer"
             >
@@ -429,7 +429,7 @@ export default function App() {
           </div>
 
           {/* Mobile menu Toggle */}
-          <button 
+          <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="p-2 text-white hover:text-brand-clay transition-colors cursor-pointer"
           >
@@ -441,16 +441,16 @@ export default function App() {
         {/* Judges / Evaluators Hackathon Interactive Controller (Sticky under top line, no-print) */}
         <div className="bg-brand-gray border-b border-slate-300 py-3 no-print sticky top-20 lg:top-0 z-30 shadow-inner">
           <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-3">
-            
+
             <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
               <div className="flex items-center gap-2 shrink-0">
                 <div className="w-2 h-2 rounded-full bg-brand-clay animate-ping"></div>
                 <span className="text-xs font-black text-brand-navy">التحكم التجريبي:</span>
               </div>
-              
+
               <div className="flex items-center gap-1.5">
                 <span className="text-[10px] font-bold text-slate-500">المستفيد:</span>
-                <select 
+                <select
                   value={selectedUserId}
                   onChange={(e) => setSelectedUserId(e.target.value)}
                   className="px-2.5 py-1.5 text-[10px] font-bold text-brand-navy bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-brand-purple cursor-pointer"
@@ -466,27 +466,27 @@ export default function App() {
               {certificate && (
                 <div className="flex items-center gap-1.5 shrink-0">
                   <span className="text-[10px] font-bold text-slate-500">حالة الشهادة:</span>
-                  <select 
+                  <select
                     value={certificate.status}
                     onChange={(e) => {
                       const val = e.target.value as 'active' | 'expired' | 'used';
                       const today = new Date();
                       let issueStr = today.toISOString().split('T')[0];
-                      
+
                       const expiry = new Date(today);
                       expiry.setMonth(today.getMonth() + 1);
                       let expiryStr = expiry.toISOString().split('T')[0];
-                      
+
                       if (val === 'expired') {
                         const pastDate = new Date();
                         pastDate.setDate(pastDate.getDate() - 45); // 45 days ago
                         issueStr = pastDate.toISOString().split('T')[0];
-                        
+
                         const pastExpiry = new Date(pastDate);
                         pastExpiry.setMonth(pastExpiry.getMonth() + 1);
                         expiryStr = pastExpiry.toISOString().split('T')[0];
                       }
-                      
+
                       setCertificate({
                         ...certificate,
                         status: val,
@@ -512,11 +512,10 @@ export default function App() {
                 <button
                   key={screen.id}
                   onClick={() => handleNavigate(screen.id as ScreenId)}
-                  className={`px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition-all cursor-pointer border ${
-                    currentScreen === screen.id 
-                      ? 'bg-brand-navy text-white border-brand-navy shadow-sm scale-105' 
+                  className={`px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition-all cursor-pointer border ${currentScreen === screen.id
+                      ? 'bg-brand-navy text-white border-brand-navy shadow-sm scale-105'
                       : 'bg-white hover:bg-slate-50 text-slate-600 border-slate-200'
-                  }`}
+                    }`}
                 >
                   {screen.label}
                 </button>
@@ -538,15 +537,15 @@ export default function App() {
             <ConnectView onNavigate={handleNavigate} />
           )}
           {currentScreen === 'dashboard' && (
-            <DashboardView 
-              onNavigate={handleNavigate} 
+            <DashboardView
+              onNavigate={handleNavigate}
               financials={financials}
               loading={loading}
             />
           )}
           {currentScreen === 'test_obligation' && (
-            <TestObligationView 
-              onNavigate={handleNavigate} 
+            <TestObligationView
+              onNavigate={handleNavigate}
               onUpdateInstallment={setTestedInstallment}
               currentInstallment={testedInstallment}
               financials={financials}
@@ -554,16 +553,16 @@ export default function App() {
             />
           )}
           {currentScreen === 'result' && (
-            <ResultView 
-              onNavigate={handleNavigate} 
+            <ResultView
+              onNavigate={handleNavigate}
               testedInstallment={testedInstallment}
               financials={financials}
               loading={loading}
             />
           )}
           {currentScreen === 'certificate' && (
-            <CertificateView 
-              onNavigate={handleNavigate} 
+            <CertificateView
+              onNavigate={handleNavigate}
               testedInstallment={testedInstallment}
               financials={financials}
               loading={loading}
@@ -571,8 +570,8 @@ export default function App() {
             />
           )}
           {currentScreen === 'recommendations' && (
-            <RecommendationsView 
-              onNavigate={handleNavigate} 
+            <RecommendationsView
+              onNavigate={handleNavigate}
               testedInstallment={testedInstallment}
               financials={financials}
               loading={loading}
@@ -582,8 +581,8 @@ export default function App() {
             <PrivacyView onNavigate={handleNavigate} />
           )}
           {currentScreen === 'funder' && (
-            <FunderView 
-              onNavigate={handleNavigate} 
+            <FunderView
+              onNavigate={handleNavigate}
               testedInstallment={testedInstallment}
               initialVerificationId={initialVerificationId}
               financials={financials}
@@ -616,7 +615,7 @@ export default function App() {
         {/* 4. Footer */}
         <footer className="bg-brand-navy text-white/50 text-xs py-8 border-t border-white/5 no-print mt-auto">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-3">
-            
+
             <div className="flex items-center justify-center gap-1.5 text-white font-bold">
               <ShieldCheck className="w-4 h-4 text-brand-success" />
               <span>منصة قدها لتوثيق الملاءة المالية الآمنة 2026</span>
@@ -638,26 +637,26 @@ export default function App() {
       {/* 5. Mobile Side Navigation Drawer (Sliding from Right) */}
       {mobileMenuOpen && (
         <div className="lg:hidden fixed inset-0 z-50 flex flex-row-reverse no-print">
-          
+
           {/* Backdrop Overlay */}
-          <div 
-            className="fixed inset-0 bg-black/60 transition-opacity" 
+          <div
+            className="fixed inset-0 bg-black/60 transition-opacity"
             onClick={() => setMobileMenuOpen(false)}
           ></div>
-          
+
           {/* Drawer Menu */}
           <aside className="relative flex flex-col w-72 bg-brand-navy text-white h-full shadow-2xl z-10 animate-slideInRight">
             {/* Close Button Inside Menu */}
             <div className="p-4 border-b border-white/10 flex justify-between items-center">
               <span className="text-xs font-bold text-slate-400">القائمة الرئيسية</span>
-              <button 
+              <button
                 onClick={() => setMobileMenuOpen(false)}
                 className="p-1.5 rounded-lg bg-white/5 text-white hover:bg-white/10 cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
-            
+
             {/* Embedded sidebar menu */}
             <div className="flex-1 overflow-y-auto">
               <SidebarContent />
