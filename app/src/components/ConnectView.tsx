@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ShieldAlert, ShieldCheck, CreditCard, ChevronLeft, ChevronRight, Plus, RefreshCw, Check, ArrowLeft, ArrowRight, XCircle } from 'lucide-react';
 import { ScreenId, BankAccount } from '../types';
-import RiyalSymbol from './RiyalSymbol';
+import RiyalSymbol, { formatCurrency } from './RiyalSymbol';
 
 interface SaudiBankOption {
   id: string;
@@ -261,7 +261,7 @@ export default function ConnectView({ onNavigate }: ConnectViewProps) {
                   <span className="text-lg font-black text-brand-navy font-mono">
                     {acc.isConnected ? (
                       <>
-                        {acc.balance.toLocaleString()} <RiyalSymbol className="mr-1 text-slate-500 text-sm" />
+                        {formatCurrency(acc.balance)} <RiyalSymbol className="mr-1 text-slate-500 text-sm" />
                       </>
                     ) : '—'}
                   </span>

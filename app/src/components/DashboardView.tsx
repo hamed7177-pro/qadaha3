@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Sparkles, Calendar, ArrowUpRight, TrendingUp, DollarSign, PieChart, ShieldCheck, ChevronLeft, ArrowDownRight, Clock } from 'lucide-react';
 import { ScreenId, Transaction, UserFinancials } from '../types';
-import RiyalSymbol from './RiyalSymbol';
+import RiyalSymbol, { formatCurrency } from './RiyalSymbol';
 
 interface DashboardViewProps {
   onNavigate: (screenId: ScreenId) => void;
@@ -105,7 +105,7 @@ export default function DashboardView({ onNavigate, financials, loading }: Dashb
         <div className="bg-white rounded-2xl p-6 border border-brand-gray shadow-sm space-y-3">
           <span className="text-xs text-slate-400 font-bold block">متوسط الدخل الشهري (12 شهر)</span>
           <div className="flex justify-between items-baseline">
-            <span className="text-2xl font-black text-brand-navy font-mono">{avgIncome.toLocaleString()} <RiyalSymbol className="mr-1 text-slate-500" /></span>
+            <span className="text-2xl font-black text-brand-navy font-mono">{formatCurrency(avgIncome)} <RiyalSymbol className="mr-1 text-slate-500" /></span>
             <span className="text-xs text-brand-success font-bold flex items-center gap-0.5">
               <ArrowUpRight className="w-3 h-3" />
               <span>{financials.incomeVolatilityScore <= 15 ? 'مستقر' : 'متذبذب'}</span>
@@ -118,7 +118,7 @@ export default function DashboardView({ onNavigate, financials, loading }: Dashb
         <div className="bg-white rounded-2xl p-6 border border-brand-gray shadow-sm space-y-3">
           <span className="text-xs text-slate-400 font-bold block">الالتزامات البنكية القائمة</span>
           <div className="flex justify-between items-baseline">
-            <span className="text-2xl font-black text-brand-navy font-mono">{avgObligations.toLocaleString()} <RiyalSymbol className="mr-1 text-slate-500" /></span>
+            <span className="text-2xl font-black text-brand-navy font-mono">{formatCurrency(avgObligations)} <RiyalSymbol className="mr-1 text-slate-500" /></span>
             <span className="text-xs text-brand-clay font-bold flex items-center gap-0.5">
               <span>{((avgObligations / avgIncome) * 100).toFixed(0)}% من الدخل</span>
             </span>
@@ -130,7 +130,7 @@ export default function DashboardView({ onNavigate, financials, loading }: Dashb
         <div className="bg-white rounded-2xl p-6 border border-brand-gray shadow-sm space-y-3">
           <span className="text-xs text-slate-400 font-bold block">الفائض المالي الشهري المتاح</span>
           <div className="flex justify-between items-baseline">
-            <span className="text-2xl font-black text-brand-navy font-mono">{avgSurplus.toLocaleString()} <RiyalSymbol className="mr-1 text-slate-500" /></span>
+            <span className="text-2xl font-black text-brand-navy font-mono">{formatCurrency(avgSurplus)} <RiyalSymbol className="mr-1 text-slate-500" /></span>
             <span className="text-xs text-brand-success font-bold flex items-center gap-0.5">
               <span>{avgSurplus > 0 ? 'إيجابي' : 'سلبي'}</span>
             </span>
@@ -140,14 +140,20 @@ export default function DashboardView({ onNavigate, financials, loading }: Dashb
 
         {/* Metric 4 */}
         <div className="bg-white rounded-2xl p-6 border border-brand-gray shadow-sm space-y-3">
-          <span className="text-xs text-slate-400 font-bold block">مؤشر استقرار التدفق النقدي</span>
+          <span className="text-xs text-slate-400 font-bold block">مؤشر ملاءة قدها الحالي</span>
           <div className="flex justify-between items-baseline">
-            <span className="text-2xl font-black text-brand-navy font-mono">{balanceStability}%</span>
-            <span className="text-xs text-brand-purple font-bold">
-              {balanceStability >= 75 ? 'ملاءة ممتازة' : balanceStability >= 50 ? 'ملاءة جيدة' : 'ملاءة بحذر'}
+            <span className="text-2xl font-black text-brand-navy font-mono">{financials.currentQadahaScore || financials.qadahaScore}/100</span>
+            <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${
+              (financials.currentPrediction || financials.prediction) === 'Suitable' ? 'bg-brand-success/15 text-brand-success' :
+              (financials.currentPrediction || financials.prediction) === 'Caution' ? 'bg-brand-warning/15 text-brand-warning' :
+              'bg-brand-danger/15 text-brand-danger'
+            }`}>
+              {(financials.currentPrediction || financials.prediction) === 'Suitable' ? 'مناسب' :
+               (financials.currentPrediction || financials.prediction) === 'Caution' ? 'مناسب بحذر' :
+               'غير مناسب'}
             </span>
           </div>
-          <p className="text-[10px] text-slate-500">يعبر عن مدى انتظام واستقرار الرصيد طوال العام</p>
+          <p className="text-[10px] text-slate-500">التقييم الذكي للملاءة المالية قبل الالتزام المقترح</p>
         </div>
 
       </div>
@@ -157,17 +163,17 @@ export default function DashboardView({ onNavigate, financials, loading }: Dashb
         
         {/* Cashflow Line Chart (12 Months) */}
         <div className="lg:col-span-8 bg-white rounded-3xl p-6 border border-brand-gray shadow-sm space-y-6">
-          <div className="flex justify-between items-center flex-row-reverse">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
               <h3 className="text-lg font-bold text-brand-navy">منحنى التدفقات النقدية (السنة الماضية)</h3>
               <p className="text-xs text-slate-400">مقارنة التدفقات النقدية الداخلة (الواردة) والخارجة (الصادرة) شهرياً لـ {financials.name.split(' ')[0]}</p>
             </div>
             <div className="flex items-center gap-4 text-xs font-semibold">
-              <div className="flex items-center gap-1.5 flex-row-reverse">
+              <div className="flex items-center gap-1.5">
                 <span className="w-3 h-3 rounded-full bg-brand-purple block"></span>
                 <span className="text-slate-600">التدفق الداخل (الوارد)</span>
               </div>
-              <div className="flex items-center gap-1.5 flex-row-reverse">
+              <div className="flex items-center gap-1.5">
                 <span className="w-3 h-3 rounded-full bg-brand-clay block"></span>
                 <span className="text-slate-600">التدفق الخارج (الصادر)</span>
               </div>
@@ -330,7 +336,7 @@ export default function DashboardView({ onNavigate, financials, loading }: Dashb
                       fill="#8F8BEA"
                       className="text-[9px] font-bold"
                     >
-                      الوارد: {monthlyIncome[activeMonthIdx].toLocaleString()} ⃁
+                      الوارد: {formatCurrency(monthlyIncome[activeMonthIdx])} ⃁
                     </text>
                     {/* Expense value */}
                     <text
@@ -343,7 +349,7 @@ export default function DashboardView({ onNavigate, financials, loading }: Dashb
                       fill="#C86B4F"
                       className="text-[9px] font-bold"
                     >
-                      الصادر: {monthlyExpenses[activeMonthIdx].toLocaleString()} ⃁
+                      الصادر: {formatCurrency(monthlyExpenses[activeMonthIdx])} ⃁
                     </text>
                   </g>
                 )}
@@ -361,26 +367,29 @@ export default function DashboardView({ onNavigate, financials, loading }: Dashb
 
           <div className="flex flex-col items-center justify-center space-y-4">
             {/* Pure SVG Donut Chart */}
-            <div className="relative w-36 h-36 flex items-center justify-center">
-              <svg width="140" height="140" viewBox="0 0 140 140" className="transform -rotate-90">
-                <circle cx="70" cy="70" r="50" fill="none" stroke="#EEF1F4" strokeWidth="16" />
+            <div className="relative w-44 h-44 flex items-center justify-center">
+              <svg width="170" height="170" viewBox="0 0 180 180" className="transform -rotate-90">
+                <circle cx="90" cy="90" r="70" fill="none" stroke="#EEF1F4" strokeWidth="16" />
                 
-                {/* Segment 1: Housing SA93 (42%) */}
-                <circle cx="70" cy="70" r="50" fill="none" stroke="#071B33" strokeWidth="18"
-                  strokeDasharray="314" strokeDashoffset="132" strokeLinecap="round" />
+                {/* Segment 1: Housing (42%) */}
+                <circle cx="90" cy="90" r="70" fill="none" stroke="#071B33" strokeWidth="18"
+                  strokeDasharray="440" strokeDashoffset="255" strokeLinecap="round" />
                   
                 {/* Segment 2: Food (27%) */}
-                <circle cx="70" cy="70" r="50" fill="none" stroke="#C86B4F" strokeWidth="18"
-                  strokeDasharray="314" strokeDashoffset="217" className="transform origin-[70px_70px] rotate-[151deg]" />
+                <circle cx="90" cy="90" r="70" fill="none" stroke="#C86B4F" strokeWidth="18"
+                  strokeDasharray="440" strokeDashoffset="321" className="transform origin-[90px_90px] rotate-[151deg]" strokeLinecap="round" />
                   
                 {/* Segment 3: Work (16%) */}
-                <circle cx="70" cy="70" r="50" fill="none" stroke="#8F8BEA" strokeWidth="18"
-                  strokeDasharray="314" strokeDashoffset="264" className="transform origin-[70px_70px] rotate-[248deg]" />
+                <circle cx="90" cy="90" r="70" fill="none" stroke="#8F8BEA" strokeWidth="18"
+                  strokeDasharray="440" strokeDashoffset="370" className="transform origin-[90px_90px] rotate-[248deg]" strokeLinecap="round" />
               </svg>
               
-              <div className="absolute text-center">
-                <span className="text-xs text-slate-400 block">إجمالي الصرف</span>
-                <span className="text-sm font-black font-mono text-brand-navy">{avgExpenses.toLocaleString()} <RiyalSymbol className="mr-0.5 text-slate-500" /></span>
+              <div className="absolute text-center space-y-0.5">
+                <span className="text-xs text-slate-400 block font-bold">إجمالي الصرف</span>
+                <span className="text-xl font-black font-mono text-brand-navy">
+                  {formatCurrency(avgExpenses)}
+                  <RiyalSymbol className="mr-1 text-slate-500 text-xs inline-block" />
+                </span>
               </div>
             </div>
 
@@ -392,7 +401,7 @@ export default function DashboardView({ onNavigate, financials, loading }: Dashb
                     <span className="text-slate-600">{c.name}</span>
                   </div>
                   <div className="flex gap-2 items-center font-mono">
-                    <span className="font-bold text-brand-navy">{c.value.toLocaleString()} <RiyalSymbol className="mr-0.5 text-slate-400" /></span>
+                    <span className="font-bold text-brand-navy">{formatCurrency(c.value)} <RiyalSymbol className="mr-0.5 text-slate-400" /></span>
                     <span className="text-slate-400">({c.percentage})</span>
                   </div>
                 </div>
@@ -421,7 +430,7 @@ export default function DashboardView({ onNavigate, financials, loading }: Dashb
               </div>
             </div>
             <div className="text-left font-mono">
-              <span className="text-sm font-black block text-brand-navy">{(avgObligations > 250 ? avgObligations - 250 : avgObligations).toLocaleString()} <RiyalSymbol className="mr-0.5 text-slate-500" /></span>
+              <span className="text-sm font-black block text-brand-navy">{formatCurrency(avgObligations > 250 ? avgObligations - 250 : avgObligations)} <RiyalSymbol className="mr-0.5 text-slate-500" /></span>
               <span className="text-[10px] text-slate-400 block">يوم 27 من كل شهر</span>
             </div>
           </div>
@@ -437,7 +446,7 @@ export default function DashboardView({ onNavigate, financials, loading }: Dashb
               </div>
             </div>
             <div className="text-left font-mono">
-              <span className="text-sm font-black block text-brand-navy">{(avgObligations > 250 ? 250 : 0).toLocaleString()} <RiyalSymbol className="mr-0.5 text-slate-500" /></span>
+              <span className="text-sm font-black block text-brand-navy">{formatCurrency(avgObligations > 250 ? 250 : 0)} <RiyalSymbol className="mr-0.5 text-slate-500" /></span>
               <span className="text-[10px] text-slate-400 block">متوسط صرف متكرر</span>
             </div>
           </div>

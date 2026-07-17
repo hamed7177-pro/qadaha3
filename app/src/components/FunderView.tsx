@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Landmark, CheckCircle, ShieldCheck, XCircle, Search, HelpCircle, Lock, AlertCircle, FileText, Calendar, Percent } from 'lucide-react';
 import { ScreenId, UserFinancials, Certificate } from '../types';
-import RiyalSymbol from './RiyalSymbol';
+import RiyalSymbol, { formatCurrency } from './RiyalSymbol';
 
 interface FunderViewProps {
   onNavigate: (screenId: ScreenId) => void;
@@ -228,7 +228,7 @@ export default function FunderView({
                   <span className="text-xs text-slate-400 font-bold block">نطاق القسط المختبر</span>
                   
                   <div className="space-y-1">
-                    <span className="text-xl font-bold font-mono text-brand-navy block">{testedInstallment.toLocaleString()} <RiyalSymbol className="mr-1 text-slate-500" /></span>
+                    <span className="text-xl font-bold font-mono text-brand-navy block">{formatCurrency(testedInstallment)} <RiyalSymbol className="mr-1 text-slate-500" /></span>
                     <span className="text-[10px] text-slate-500 block">شهرياً كقسط تمويل مستهدف للتقييم</span>
                   </div>
                   
@@ -264,7 +264,7 @@ export default function FunderView({
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
                   <div className="flex justify-between p-3 bg-slate-50 rounded-xl">
-                    <span className="font-extrabold font-mono text-brand-navy">{financials.avgMonthlyIncome12m.toLocaleString()} <RiyalSymbol className="mr-1 text-slate-500" /></span>
+                    <span className="font-extrabold font-mono text-brand-navy">{formatCurrency(financials.avgMonthlyIncome12m)} <RiyalSymbol className="mr-1 text-slate-500" /></span>
                     <span className="text-slate-500">متوسط الدخل الشهري الفعلي للسنة (12 شهر):</span>
                   </div>
                   <div className="flex justify-between p-3 bg-slate-50 rounded-xl">
@@ -274,11 +274,11 @@ export default function FunderView({
                     <span className="text-slate-500">مؤشر تذبذب الدخل الشهري:</span>
                   </div>
                   <div className="flex justify-between p-3 bg-slate-50 rounded-xl">
-                    <span className="font-extrabold font-mono text-brand-navy">{financials.monthlyObligations.toLocaleString()} <RiyalSymbol className="mr-1 text-slate-500" /></span>
+                    <span className="font-extrabold font-mono text-brand-navy">{formatCurrency(financials.monthlyObligations)} <RiyalSymbol className="mr-1 text-slate-500" /></span>
                     <span className="text-slate-500">الالتزامات البنكية والقروض الأخرى القائمة:</span>
                   </div>
                   <div className="flex justify-between p-3 bg-slate-50 rounded-xl">
-                    <span className="font-extrabold font-mono text-brand-navy">{(financials.avgMonthlyIncome12m - financials.monthlyObligations - testedInstallment - financials.avgMonthlyExpenses).toLocaleString()} <RiyalSymbol className="mr-1 text-slate-500" /></span>
+                    <span className="font-extrabold font-mono text-brand-navy">{formatCurrency(financials.avgMonthlyIncome12m - financials.monthlyObligations - testedInstallment - financials.avgMonthlyExpenses)} <RiyalSymbol className="mr-1 text-slate-500" /></span>
                     <span className="text-slate-500">متوسط الفائض المالي المتاح شهرياً:</span>
                   </div>
                 </div>

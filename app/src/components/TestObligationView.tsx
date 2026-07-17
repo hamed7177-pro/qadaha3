@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Sparkles, HelpCircle, ArrowLeft, ArrowRight, ShieldCheck, ChevronLeft, CreditCard, Landmark, Percent } from 'lucide-react';
 import { ScreenId, UserFinancials } from '../types';
-import RiyalSymbol from './RiyalSymbol';
+import RiyalSymbol, { formatCurrency } from './RiyalSymbol';
 
 interface TestObligationViewProps {
   onNavigate: (screenId: ScreenId) => void;
@@ -247,7 +247,7 @@ export default function TestObligationView({
                 <span className="font-bold">أثر القسط المالي الجديد</span>
               </div>
               <p className="text-white/80 leading-relaxed font-mono">
-                قسط الالتزام الجديد بقيمة <span className="font-bold text-white">{installment.toLocaleString()} <RiyalSymbol className="mr-1 text-white/80" /></span> يرفع نسبة التزاماتك من <span className="font-bold text-brand-success">{originalRatio.toFixed(0)}%</span> إلى <span className="font-bold text-brand-clay">{obligationRatio.toFixed(0)}%</span> من متوسط دخلك الشهري. هذا المؤشر يضع ملاءتك تحت الملاحظة.
+                قسط الالتزام الجديد بقيمة <span className="font-bold text-white">{formatCurrency(installment)} <RiyalSymbol className="mr-1 text-white/80" /></span> يرفع نسبة التزاماتك من <span className="font-bold text-brand-success">{originalRatio.toFixed(0)}%</span> إلى <span className="font-bold text-brand-clay">{obligationRatio.toFixed(0)}%</span> من متوسط دخلك الشهري. هذا المؤشر يضع ملاءتك تحت الملاحظة.
               </p>
             </div>
 

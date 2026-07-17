@@ -47,6 +47,8 @@ export interface UserFinancials {
   monthlyIncomeHistory?: number[];
   monthlyExpensesHistory?: number[];
   monthlyObligationsHistory?: number[];
+  currentQadahaScore?: number;
+  currentPrediction?: 'Suitable' | 'Caution' | 'NotSuitable';
 }
 
 export interface ChatMessage {

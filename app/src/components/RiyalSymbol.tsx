@@ -28,3 +28,9 @@ export default function RiyalSymbol({ className = '', size = 'inline' }: RiyalSy
     </svg>
   );
 }
+
+export function formatCurrency(value: number): string {
+  if (value === undefined || value === null || isNaN(value)) return '0';
+  // Round to max 1 decimal place, convert to number, and format with commas
+  return Number(value.toFixed(1)).toLocaleString('en-US');
+}

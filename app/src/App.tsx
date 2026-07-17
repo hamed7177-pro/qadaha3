@@ -91,43 +91,62 @@ export default function App() {
   useEffect(() => {
     if (!selectedUserId) return;
     setLoading(true);
-    fetch(`${API_BASE_URL}/api/predict/?user_id=${selectedUserId}&installment=${testedInstallment}`)
-      .then((res) => {
-        if (!res.ok) throw new Error('Failed to fetch prediction');
-        return res.json();
-      })
-      .then((data) => {
-        let prediction: 'Suitable' | 'Caution' | 'NotSuitable' = 'Caution';
-        if (data.prediction === 'Suitable') {
-          prediction = 'Suitable';
-        } else if (data.prediction === 'Not Suitable') {
-          prediction = 'NotSuitable';
+
+    const proposedUrl = `${API_BASE_URL}/api/predict/?user_id=${selectedUserId}&installment=${testedInstallment}`;
+    const currentUrl = `${API_BASE_URL}/api/predict/?user_id=${selectedUserId}&installment=0`;
+
+    const proposedPromise = fetch(proposedUrl).then((res) => {
+      if (!res.ok) throw new Error('Failed to fetch proposed prediction');
+      return res.json();
+    });
+
+    const currentPromise = fetch(currentUrl).then((res) => {
+      if (!res.ok) throw new Error('Failed to fetch current prediction');
+      return res.json();
+    });
+
+    Promise.all([proposedPromise, currentPromise])
+      .then(([proposedData, currentData]) => {
+        let proposedPrediction: 'Suitable' | 'Caution' | 'NotSuitable' = 'Caution';
+        if (proposedData.prediction === 'Suitable') {
+          proposedPrediction = 'Suitable';
+        } else if (proposedData.prediction === 'Not Suitable') {
+          proposedPrediction = 'NotSuitable';
         }
 
+        let currentPrediction: 'Suitable' | 'Caution' | 'NotSuitable' = 'Caution';
+        if (currentData.prediction === 'Suitable') {
+          currentPrediction = 'Suitable';
+        } else if (currentData.prediction === 'Not Suitable') {
+          currentPrediction = 'NotSuitable';
+        }
+        
         let riskLevel: 'Low' | 'Medium' | 'High' = 'Medium';
-        if (data.risk_level.includes('منخفضة')) {
+        if (proposedData.risk_level.includes('منخفضة')) {
           riskLevel = 'Low';
-        } else if (data.risk_level.includes('عالية')) {
+        } else if (proposedData.risk_level.includes('عالية')) {
           riskLevel = 'High';
         }
 
         setFinancials({
-          name: data.user.full_name,
-          role: data.user.role || 'عميل معتمد',
-          avgMonthlyIncome12m: data.financials.avg_income,
-          monthlyObligations: data.financials.avg_obligations,
-          avgMonthlyExpenses: data.financials.avg_expenses,
+          name: proposedData.user.full_name,
+          role: proposedData.user.role || 'عميل معتمد',
+          avgMonthlyIncome12m: proposedData.financials.avg_income,
+          monthlyObligations: proposedData.financials.avg_obligations,
+          avgMonthlyExpenses: proposedData.financials.avg_expenses,
           proposedInstallment: testedInstallment,
-          incomeVolatilityScore: data.financials.income_volatility,
-          cashflowStabilityScore: data.financials.cashflow_stability,
-          qadahaScore: data.qadaha_score,
-          prediction: prediction,
+          incomeVolatilityScore: proposedData.financials.income_volatility,
+          cashflowStabilityScore: proposedData.financials.cashflow_stability,
+          qadahaScore: proposedData.qadaha_score,
+          prediction: proposedPrediction,
           riskLevel: riskLevel,
-          reasons: data.reasons,
-          recommendations: data.recommendations,
-          monthlyIncomeHistory: data.financials.monthly_income,
-          monthlyExpensesHistory: data.financials.monthly_expenses,
-          monthlyObligationsHistory: data.financials.monthly_obligations,
+          reasons: proposedData.reasons,
+          recommendations: proposedData.recommendations,
+          monthlyIncomeHistory: proposedData.financials.monthly_income,
+          monthlyExpensesHistory: proposedData.financials.monthly_expenses,
+          monthlyObligationsHistory: proposedData.financials.monthly_obligations,
+          currentQadahaScore: currentData.qadaha_score,
+          currentPrediction: currentPrediction
         } as any);
       })
       .catch((err) => {
@@ -157,7 +176,9 @@ export default function App() {
             ],
             monthlyIncomeHistory: [11800, 11800, 11800, 11800, 11800, 11800, 11800, 11800, 11800, 11800, 11800, 11800],
             monthlyExpensesHistory: [8500, 9200, 7800, 8900, 9500, 8100, 8400, 9000, 8700, 9100, 8300, 8600],
-            monthlyObligationsHistory: [3200, 3200, 3200, 3200, 3200, 3200, 3200, 3200, 3200, 3200, 3200, 3200]
+            monthlyObligationsHistory: [3200, 3200, 3200, 3200, 3200, 3200, 3200, 3200, 3200, 3200, 3200, 3200],
+            currentQadahaScore: 88,
+            currentPrediction: 'Suitable'
           } as any);
         }
       })
@@ -267,7 +288,7 @@ export default function App() {
   };
 
   const SidebarContent = () => (
-    <div className="flex flex-col h-full justify-between p-6">
+    <div className="flex flex-col min-h-full justify-between p-6">
 
       {/* Top Sidebar Body */}
       <div className="space-y-8">
@@ -398,7 +419,7 @@ export default function App() {
     <div className="min-h-screen bg-brand-bg flex text-right font-sans selection:bg-brand-purple/20 relative overflow-x-hidden" dir="rtl">
 
       {/* 1. Desktop Fixed Sidebar */}
-      <aside className="hidden lg:flex flex-col w-72 bg-brand-navy text-white h-screen fixed top-0 right-0 z-40 border-l border-white/5 no-print">
+      <aside className="hidden lg:flex flex-col w-72 bg-brand-navy text-white h-screen fixed top-0 right-0 z-40 border-l border-white/5 no-print overflow-y-auto scrollbar-thin">
         <SidebarContent />
       </aside>
 
@@ -440,7 +461,7 @@ export default function App() {
 
         {/* Judges / Evaluators Hackathon Interactive Controller (Sticky under top line, no-print) */}
         <div className="bg-brand-gray border-b border-slate-300 py-3 no-print sticky top-20 lg:top-0 z-30 shadow-inner">
-          <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-3">
+          <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-start gap-3">
 
             <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
               <div className="flex items-center gap-2 shrink-0">
@@ -504,22 +525,6 @@ export default function App() {
                   </select>
                 </div>
               )}
-            </div>
-
-            {/* Scrollable screen buttons list */}
-            <div className="w-full md:w-auto overflow-x-auto whitespace-nowrap py-1 scrollbar-none flex gap-1.5 justify-start">
-              {hackathonScreens.map((screen) => (
-                <button
-                  key={screen.id}
-                  onClick={() => handleNavigate(screen.id as ScreenId)}
-                  className={`px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition-all cursor-pointer border ${currentScreen === screen.id
-                      ? 'bg-brand-navy text-white border-brand-navy shadow-sm scale-105'
-                      : 'bg-white hover:bg-slate-50 text-slate-600 border-slate-200'
-                    }`}
-                >
-                  {screen.label}
-                </button>
-              ))}
             </div>
 
           </div>

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ShieldCheck, Share2, Download, Copy, Printer, Check, QrCode, Lock, AlertCircle, FileText, ChevronRight } from 'lucide-react';
 import { ScreenId, Certificate, UserFinancials } from '../types';
-import RiyalSymbol from './RiyalSymbol';
+import RiyalSymbol, { formatCurrency } from './RiyalSymbol';
 import { analyzeFinancials, FAHAD_12M_INCOME, FAHAD_12M_EXPENSES, FAHAD_12M_OBLIGATIONS } from '../utils/calculations';
 
 interface CertificateViewProps {
@@ -168,25 +168,25 @@ export default function CertificateView({ onNavigate, testedInstallment, financi
               {/* average monthly income */}
               <div className="flex justify-between items-center border-b border-dashed border-slate-200 pb-2">
                 <span className="text-slate-500">متوسط الدخل الشهري الفعلي لمدة سنة (12 شهر):</span>
-                <span className="font-extrabold font-mono text-brand-navy">{financials.avgMonthlyIncome12m.toLocaleString()} <RiyalSymbol className="mr-1 text-slate-500" /></span>
+                <span className="font-extrabold font-mono text-brand-navy">{formatCurrency(financials.avgMonthlyIncome12m)} <RiyalSymbol className="mr-1 text-slate-500" /></span>
               </div>
 
               {/* obligations */}
               <div className="flex justify-between items-center border-b border-dashed border-slate-200 pb-2">
                 <span className="text-slate-500">الالتزامات البنكية والقروض الأخرى القائمة:</span>
-                <span className="font-extrabold font-mono text-brand-navy">{financials.monthlyObligations.toLocaleString()} <RiyalSymbol className="mr-1 text-slate-500" /></span>
+                <span className="font-extrabold font-mono text-brand-navy">{formatCurrency(financials.monthlyObligations)} <RiyalSymbol className="mr-1 text-slate-500" /></span>
               </div>
 
               {/* tested installment */}
               <div className="flex justify-between items-center border-b border-dashed border-slate-200 pb-2">
                 <span className="text-slate-500">القسط الشهري المقترح للتفتيش / التمويل:</span>
-                <span className="font-extrabold font-mono text-brand-clay">{testedInstallment.toLocaleString()} <RiyalSymbol className="mr-1 text-brand-clay" /></span>
+                <span className="font-extrabold font-mono text-brand-clay">{formatCurrency(testedInstallment)} <RiyalSymbol className="mr-1 text-brand-clay" /></span>
               </div>
 
               {/* surplus */}
               <div className="flex justify-between items-center border-b border-dashed border-slate-200 pb-2">
                 <span className="text-slate-500">متوسط الفائض المالي المتاح شهرياً:</span>
-                <span className="font-extrabold font-mono text-brand-navy">{(financials.avgMonthlyIncome12m - financials.monthlyObligations - testedInstallment - financials.avgMonthlyExpenses).toLocaleString()} <RiyalSymbol className="mr-1 text-slate-500" /></span>
+                <span className="font-extrabold font-mono text-brand-navy">{formatCurrency(financials.avgMonthlyIncome12m - financials.monthlyObligations - testedInstallment - financials.avgMonthlyExpenses)} <RiyalSymbol className="mr-1 text-slate-500" /></span>
               </div>
 
               {/* volatility index */}
