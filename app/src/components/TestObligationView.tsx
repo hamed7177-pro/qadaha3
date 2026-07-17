@@ -40,6 +40,7 @@ export default function TestObligationView({
   const totalObligationsWithNew = currentObligations + installment;
   const obligationRatio = avgIncome > 0 ? (totalObligationsWithNew / avgIncome) * 100 : 0;
   const originalRatio = (currentObligations / avgIncome) * 100;
+  const recommendedInstallment = Math.max(0, Math.floor(0.33 * avgIncome - currentObligations));
 
   const handleCalculate = () => {
     onUpdateInstallment(installment);
@@ -51,9 +52,9 @@ export default function TestObligationView({
       
       {/* Progress Steps Header */}
       <div className="bg-white rounded-2xl p-6 border border-brand-gray shadow-sm">
-        <div className="flex flex-row-reverse items-center justify-between relative max-w-2xl mx-auto">
+        <div className="flex items-center justify-between relative max-w-2xl mx-auto">
           <div className="absolute top-1/2 left-0 right-0 h-1 bg-brand-gray -translate-y-1/2 z-0"></div>
-          <div className="absolute top-1/2 right-0 w-3/5 h-1 bg-brand-purple -translate-y-1/2 z-0 transition-all"></div>
+          <div className="absolute top-1/2 right-0 w-[75%] h-1 bg-brand-purple -translate-y-1/2 z-0 transition-all"></div>
           
           <div className="flex flex-col items-center z-10 space-y-1">
             <div className="w-8 h-8 rounded-full bg-brand-purple text-white flex items-center justify-center text-xs font-bold ring-4 ring-brand-purple/20">
@@ -209,7 +210,7 @@ export default function TestObligationView({
             <div className="space-y-4">
               <div className="space-y-1">
                 <span className="text-xs text-white/50 block">متوسط دخلك الفعلي</span>
-                <span className="text-xl font-bold font-mono">11,800 <RiyalSymbol className="mr-1 text-white/60" /></span>
+                <span className="text-xl font-bold font-mono">{formatCurrency(avgIncome)} <RiyalSymbol className="mr-1 text-white/60" /></span>
               </div>
 
               {/* Progress visual comparison before & after */}
@@ -256,6 +257,22 @@ export default function TestObligationView({
               * يقوم المحاكي بقياس الأثر الإحصائي العام ولا يشكل أي موافقة رسمية من الجهات المقرضة.
             </div>
 
+          </div>
+
+          {/* Safe Solvency Indicator Guidance Note */}
+          <div className="bg-white rounded-3xl p-6 border border-brand-gray shadow-md text-right space-y-3">
+            <div className="flex items-center gap-2 flex-row-reverse justify-start text-brand-purple">
+              <Sparkles className="w-5 h-5 shrink-0" />
+              <span className="text-sm font-black">إرشادات الملاءة الآمنة (قدها):</span>
+            </div>
+            <p className="text-xs text-slate-600 leading-relaxed">
+              يفضل أن يكون مؤشر ملاءة قدها الذكي بين <span className="font-bold text-brand-purple">80 إلى 100</span> للحفاظ على استقرارك المالي. بناءً على تحليلك المالي الحالي، ننصح بألا يتجاوز القسط الجديد قيمة <span className="font-bold text-brand-navy font-mono">{formatCurrency(recommendedInstallment)} <RiyalSymbol className="mr-0.5 text-slate-500" /></span> شهرياً لتبقى في النطاق الآمن والمستقر.
+            </p>
+            {recommendedInstallment === 0 && (
+              <p className="text-[10px] text-brand-clay leading-relaxed">
+                * تنبيه: التزاماتك القائمة مرتفعة بالنسبة لدخلك الحالي، يفضل خفض الالتزامات قبل التقدم لتمويل جديد.
+              </p>
+            )}
           </div>
 
         </div>

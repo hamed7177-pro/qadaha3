@@ -148,9 +148,9 @@ export default function ConnectView({ onNavigate }: ConnectViewProps) {
 
       {/* Progress Steps Header */}
       <div className="bg-white rounded-2xl p-6 border border-brand-gray shadow-sm">
-        <div className="flex flex-row-reverse items-center justify-between relative max-w-2xl mx-auto">
+        <div className="flex items-center justify-between relative max-w-2xl mx-auto">
           <div className="absolute top-1/2 left-0 right-0 h-1 bg-brand-gray -translate-y-1/2 z-0"></div>
-          <div className="absolute top-1/2 right-0 w-2/5 h-1 bg-brand-purple -translate-y-1/2 z-0 transition-all"></div>
+          <div className="absolute top-1/2 right-0 w-[25%] h-1 bg-brand-purple -translate-y-1/2 z-0 transition-all"></div>
           
           <div className="flex flex-col items-center z-10 space-y-1">
             <div className="w-8 h-8 rounded-full bg-brand-purple text-white flex items-center justify-center text-xs font-bold ring-4 ring-brand-purple/20">
