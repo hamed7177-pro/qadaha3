@@ -294,17 +294,13 @@ export default function App() {
       <div className="space-y-8">
 
         {/* Brand Logo & Name */}
-        <div className="flex items-center gap-3">
-          <div
+        <div className="flex items-center">
+          <img
+            src="/logo.png"
+            alt="Qadaha Logo"
             onClick={() => handleNavigate('landing')}
-            className="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-clay to-brand-purple flex items-center justify-center text-white font-black text-lg cursor-pointer hover:scale-105 transition-transform shrink-0"
-          >
-            ق
-          </div>
-          <div className="text-right cursor-pointer" onClick={() => handleNavigate('landing')}>
-            <h1 className="text-xl font-black tracking-tight leading-none text-white">قدها</h1>
-            <span className="text-[9px] text-slate-400 font-mono tracking-widest block mt-0.5">QADAHA SOLVENCY</span>
-          </div>
+            className="h-12 cursor-pointer object-contain hover:scale-105 transition-transform shrink-0"
+          />
         </div>
 
         {/* Sandbox Status Badge */}
@@ -389,9 +385,11 @@ export default function App() {
 
         <div className="space-y-8 max-w-md w-full relative z-10">
           {/* Logo Icon */}
-          <div className="w-20 h-20 mx-auto rounded-3xl bg-gradient-to-tr from-brand-clay to-brand-purple flex items-center justify-center text-white font-black text-4xl shadow-xl shadow-brand-purple/25 animate-pulse">
-            ق
-          </div>
+          <img
+            src="/logo.png"
+            alt="Qadaha Logo"
+            className="h-20 mx-auto object-contain animate-pulse"
+          />
 
           {/* Text Info */}
           <div className="space-y-3">
@@ -430,17 +428,13 @@ export default function App() {
         <header className="lg:hidden bg-brand-navy text-white sticky top-0 z-40 shadow-md border-b border-white/5 no-print px-4 h-20 flex justify-between items-center">
 
           {/* Logo brand and name */}
-          <div className="flex items-center gap-3">
-            <div
+          <div className="flex items-center">
+            <img
+              src="/logo.png"
+              alt="Qadaha Logo"
               onClick={() => handleNavigate('landing')}
-              className="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-clay to-brand-purple flex items-center justify-center text-white font-black text-lg cursor-pointer"
-            >
-              ق
-            </div>
-            <div className="text-right">
-              <h1 className="text-lg font-black tracking-tight leading-none text-white">قدها</h1>
-              <span className="text-[9px] text-slate-400 font-mono">QADAHA</span>
-            </div>
+              className="h-10 cursor-pointer object-contain shrink-0"
+            />
           </div>
 
           {/* Quick connection status indicator */}

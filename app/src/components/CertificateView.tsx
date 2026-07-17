@@ -101,14 +101,12 @@ export default function CertificateView({ onNavigate, testedInstallment, financi
         <div className="flex flex-col md:flex-row-reverse justify-between items-center gap-6 pb-8 border-b border-brand-gray relative z-10">
 
           {/* Logo / Emblems */}
-          <div className="flex items-center gap-3 flex-row-reverse">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-brand-navy to-brand-indigo flex items-center justify-center text-white font-black font-sans shadow-md border border-brand-purple/20">
-              ق
-            </div>
-            <div className="text-right">
-              <h1 className="text-xl font-black text-brand-navy leading-none">منصة قدها</h1>
-              <span className="text-[10px] text-slate-400 font-mono">QADAHA SOLVENCY PORTAL</span>
-            </div>
+          <div className="flex items-center flex-row-reverse">
+            <img
+              src="/logo.png"
+              alt="Qadaha Logo"
+              className="h-12 object-contain filter invert shrink-0"
+            />
           </div>
 
           {/* Certificate Title */}
