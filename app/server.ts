@@ -119,7 +119,9 @@ app.all('/api/*', async (req, res, next) => {
   if (req.path === '/api/gemini/chat' || req.path === '/api/health') {
     return next();
   }
+  // const urll = "http://127.0.0.1:8000";
   const urll = "https://qadaha3-one.vercel.app";
+
   const djangoUrl = `${urll}${req.originalUrl}`;
   try {
     const response = await fetch(djangoUrl, {
@@ -166,7 +168,7 @@ async function setupServer() {
   }
 
   app.listen(PORT, '0.0.0.0', () => {
-    console.log(`[Qadaha Server] Running on http://localhost:${PORT}`);
+    console.log(`[Qadaha Server] Running on http://ocalhost:${PORT}`);
   });
 }
 

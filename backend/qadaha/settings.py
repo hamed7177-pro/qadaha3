@@ -28,13 +28,9 @@ DEBUG = True
 ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
-    "http://localhost:3000",
-    "https://qadaha3-one.vercel.app",
     "qadaha3-one.vercel.app",
-    "https://qadaha3-ot8e.vercel.app",
     "qadaha3-ot8e.vercel.app",
-    
-    
+    "*",
 ]
 
 # Application definition
