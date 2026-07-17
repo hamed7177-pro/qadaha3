@@ -88,8 +88,8 @@ export default function RecommendationsView({ onNavigate, testedInstallment, fin
     setChatLoading(true);
 
     try {
-      // Call the secure Express backend proxy for Gemini
-      const res = await fetch('/api/gemini/chat', {
+      const API_BASE_URL = 'https://qadaha3-one.vercel.app';
+      const res = await fetch(`${API_BASE_URL}/api/gemini/chat/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -120,7 +120,7 @@ export default function App() {
         } else if (currentData.prediction === 'Not Suitable') {
           currentPrediction = 'NotSuitable';
         }
-        
+
         let riskLevel: 'Low' | 'Medium' | 'High' = 'Medium';
         if (proposedData.risk_level.includes('منخفضة')) {
           riskLevel = 'Low';
@@ -337,8 +337,8 @@ export default function App() {
                       key={item.id}
                       onClick={() => handleNavigate(item.id as ScreenId)}
                       className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-all text-right cursor-pointer group ${isActive
-                          ? 'bg-brand-clay text-white shadow-md shadow-brand-clay/10'
-                          : 'text-slate-300 hover:text-white hover:bg-white/5'
+                        ? 'bg-brand-clay text-white shadow-md shadow-brand-clay/10'
+                        : 'text-slate-300 hover:text-white hover:bg-white/5'
                         }`}
                     >
                       <IconComponent className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : 'text-slate-400 group-hover:text-white'}`} />
@@ -478,7 +478,7 @@ export default function App() {
                 >
                   {users.map((user) => (
                     <option key={user.id} value={user.id}>
-                      {user.full_name} ({user.id === 7 ? 'عمل حر' : 'موظف'})
+                      {user.full_name} ({user.role || 'عمل حر'})
                     </option>
                   ))}
                 </select>

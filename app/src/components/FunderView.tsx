@@ -155,16 +155,16 @@ export default function FunderView({
             </div>
           ) : certificate && certificate.status === 'used' ? (
             /* Already Used/Accepted Certificate layout */
-            <div className="bg-white rounded-3xl border-2 border-amber-500 p-8 shadow-lg text-center space-y-4 animate-fadeIn">
-              <div className="w-12 h-12 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center mx-auto">
-                <AlertCircle className="w-8 h-8" />
+            <div className="bg-white rounded-3xl border-2 border-brand-success p-8 shadow-lg text-center space-y-4 animate-fadeIn">
+              <div className="w-12 h-12 rounded-full bg-brand-success/10 text-brand-success flex items-center justify-center mx-auto">
+                <CheckCircle className="w-8 h-8" />
               </div>
-              <h3 className="text-lg font-black text-brand-navy">الشهادة تم استخدامها مسبقاً للحصول على تمويل</h3>
+              <h3 className="text-lg font-black text-brand-navy">تمت العملية بنجاح! تم اعتماد وقبول الشهادة</h3>
               <p className="text-xs text-slate-600 max-w-lg mx-auto">
-                رمز التوثيق <span className="font-bold text-brand-navy font-mono">{searchId.toUpperCase()}</span> تم قبوله مسبقاً وصرف تمويل بموجبه لصالح جهة <span className="font-bold text-brand-indigo">({certificate.acceptedBy})</span> بتاريخ <span className="font-bold">{certificate.acceptedDate}</span>.
+                تم قبول الشهادة (رمز: <span className="font-bold text-brand-navy font-mono">{searchId.toUpperCase()}</span>) بنجاح وصرف التمويل بموجبها لصالح جهة <span className="font-bold text-brand-indigo">({certificate.acceptedBy})</span> بتاريخ <span className="font-bold">{certificate.acceptedDate}</span>.
               </p>
-              <p className="text-xs text-red-600 font-extrabold max-w-md mx-auto leading-normal">
-                حمايةً من مخاطر التعثر المالي وتكرار التمويل، لا يمكن استخدام الشهادة الرقمية نفسها للحصول على تمويل إضافي من أي جهة أخرى.
+              <p className="text-xs text-brand-success font-extrabold max-w-md mx-auto leading-normal">
+                حمايةً من مخاطر التعثر المالي وتكرار التمويل، تم وسم هذه الشهادة الرقمية كـ "مستعملة" ولا يمكن إعادة استخدامها للحصول على تمويل إضافي من أي جهة أخرى.
               </p>
               <div className="pt-4 border-t border-brand-gray flex justify-center gap-4">
                 <button
