@@ -168,7 +168,7 @@ async function setupServer() {
   }
 
   app.listen(PORT, '0.0.0.0', () => {
-    console.log(`[Qadaha Server] Running on http://ocalhost:${PORT}`);
+    console.log(`[Qadaha Server] Running on http://localhost:${PORT}`);
   });
 }
 
