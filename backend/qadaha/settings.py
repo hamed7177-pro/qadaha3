@@ -25,8 +25,11 @@ SECRET_KEY = 'django-insecure-mp4@nr%7wx7f_5m6q!patgxsuy3xoaln$ofb$$w=11pub#%m_c
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    "qadaha3-one.vercel.app",
+]
 
 # Application definition
 
