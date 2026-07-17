@@ -33,7 +33,7 @@ export default function RecommendationsView({ onNavigate, testedInstallment, fin
     {
       days: '60 يوم',
       title: 'بناء احتياطي الطوارئ',
-      action: dynamicRecs[1] || 'ادخار فائض مالي لبناء احتياطي طوارئ بقيمة 5,000 ر.س.',
+      action: dynamicRecs[1] || 'ادخار فائض مالي لبناء احتياطي طوارئ بقيمة 5,000 ⃁.',
       impact: 'يرفع مؤشر استقرار الرصيد بشكل ملحوظ ويعزز ملاءتك.',
       completed: false,
     },
@@ -69,7 +69,7 @@ export default function RecommendationsView({ onNavigate, testedInstallment, fin
   // Suggested quick questions
   const suggestedQuestions = [
     'كيف أرفع مؤشر ملاءتي إلى 81؟',
-    'هل أستطيع تحمل قسط شهري بقيمة 1,500 ر.س؟',
+    'هل أستطيع تحمل قسط شهري بقيمة 1,500 ⃁؟',
     'لماذا نتيجة ملاءتي حالياً هي "مناسب بحذر"؟',
   ];
 
@@ -112,7 +112,7 @@ export default function RecommendationsView({ onNavigate, testedInstallment, fin
       const aiMsg: ChatMessage = {
         id: Math.random().toString(),
         sender: 'ai',
-        text: `مرحباً! يبدو أن هناك عطلاً مؤقتاً في الاتصال بالشبكة، ولكن كـ "${financials.name.split(' ')[0]}"، أنصحك بالعمل على بناء احتياطي 5,000 ر.س لتقليل الحذر التمويلي.`,
+        text: `مرحباً! يبدو أن هناك عطلاً مؤقتاً في الاتصال بالشبكة، ولكن كـ "${financials.name.split(' ')[0]}"، أنصحك بالعمل على بناء احتياطي 5,000 ⃁ لتقليل الحذر التمويلي.`,
         timestamp: new Date().toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }),
       };
       setMessages((prev) => [...prev, aiMsg]);

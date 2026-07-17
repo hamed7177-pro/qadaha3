@@ -4,7 +4,7 @@ import {
   ChevronLeft, CreditCard, Sparkles, Home, LayoutDashboard, Link2, 
   Calculator, Award, MessageSquare, LogOut, Check 
 } from 'lucide-react';
-import { ScreenId } from './types';
+import { ScreenId, Certificate, UserFinancials } from './types';
 
 // Importing all 10 Screens/Views
 import LandingView from './components/LandingView';
@@ -29,6 +29,33 @@ export default function App() {
   const [selectedUserId, setSelectedUserId] = useState<string>('7'); // Default to Fahad (ID 7)
   const [financials, setFinancials] = useState<UserFinancials | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [certificate, setCertificate] = useState<Certificate | null>(null);
+
+  // Generate a dynamic certificate when financials is loaded or updated
+  useEffect(() => {
+    if (financials) {
+      const today = new Date();
+      const issueStr = today.toISOString().split('T')[0];
+      
+      const expiry = new Date(today);
+      expiry.setMonth(today.getMonth() + 1);
+      const expiryStr = expiry.toISOString().split('T')[0];
+      
+      // Verification ID format: QDH-YYYY-XXXX
+      const year = today.getFullYear();
+      const uniqueCode = String((selectedUserId.charCodeAt(0) * 100 + Math.round(testedInstallment) % 1000)).padStart(4, '0');
+      const verificationId = `QDH-${year}-${uniqueCode}`;
+      
+      setCertificate({
+        verificationId,
+        issueDate: issueStr,
+        expiryDate: expiryStr,
+        status: 'active'
+      });
+    } else {
+      setCertificate(null);
+    }
+  }, [financials, selectedUserId, testedInstallment]);
 
   // Fetch list of open banking users from Django Sandbox on mount
   useEffect(() => {
@@ -354,6 +381,48 @@ export default function App() {
                   ))}
                 </select>
               </div>
+
+              {certificate && (
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <span className="text-[10px] font-bold text-slate-500">حالة الشهادة:</span>
+                  <select 
+                    value={certificate.status}
+                    onChange={(e) => {
+                      const val = e.target.value as 'active' | 'expired' | 'used';
+                      const today = new Date();
+                      let issueStr = today.toISOString().split('T')[0];
+                      
+                      const expiry = new Date(today);
+                      expiry.setMonth(today.getMonth() + 1);
+                      let expiryStr = expiry.toISOString().split('T')[0];
+                      
+                      if (val === 'expired') {
+                        const pastDate = new Date();
+                        pastDate.setDate(pastDate.getDate() - 45); // 45 days ago
+                        issueStr = pastDate.toISOString().split('T')[0];
+                        
+                        const pastExpiry = new Date(pastDate);
+                        pastExpiry.setMonth(pastExpiry.getMonth() + 1);
+                        expiryStr = pastExpiry.toISOString().split('T')[0];
+                      }
+                      
+                      setCertificate({
+                        ...certificate,
+                        status: val,
+                        issueDate: issueStr,
+                        expiryDate: expiryStr,
+                        acceptedBy: val === 'used' ? 'بنك الراجحي' : undefined,
+                        acceptedDate: val === 'used' ? new Date().toISOString().split('T')[0] : undefined
+                      });
+                    }}
+                    className="px-2.5 py-1.5 text-[10px] font-bold text-brand-navy bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-brand-purple cursor-pointer"
+                  >
+                    <option value="active">نشطة (صلاحية شهر)</option>
+                    <option value="expired">منتهية الصلاحية</option>
+                    <option value="used">مستعملة (تم أخذ قرض)</option>
+                  </select>
+                </div>
+              )}
             </div>
 
             {/* Scrollable screen buttons list */}
@@ -417,6 +486,7 @@ export default function App() {
               testedInstallment={testedInstallment}
               financials={financials}
               loading={loading}
+              certificate={certificate}
             />
           )}
           {currentScreen === 'recommendations' && (
@@ -437,6 +507,27 @@ export default function App() {
               initialVerificationId={initialVerificationId}
               financials={financials}
               loading={loading}
+              certificate={certificate}
+              onAcceptCertificate={(bankName: string) => {
+                if (certificate) {
+                  setCertificate({
+                    ...certificate,
+                    status: 'used',
+                    acceptedBy: bankName,
+                    acceptedDate: new Date().toISOString().split('T')[0]
+                  });
+                }
+              }}
+              onResetCertificate={() => {
+                if (certificate) {
+                  setCertificate({
+                    ...certificate,
+                    status: 'active',
+                    acceptedBy: undefined,
+                    acceptedDate: undefined
+                  });
+                }
+              }}
             />
           )}
         </main>

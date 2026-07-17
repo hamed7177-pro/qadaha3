@@ -1,6 +1,7 @@
 import React from 'react';
 import { HelpCircle, AlertTriangle, ShieldCheck, ChevronLeft, ArrowRight, ClipboardCheck, ArrowLeftRight, Percent } from 'lucide-react';
 import { ScreenId, UserFinancials } from '../types';
+import RiyalSymbol from './RiyalSymbol';
 import { analyzeFinancials, FAHAD_12M_INCOME, FAHAD_12M_EXPENSES, FAHAD_12M_OBLIGATIONS } from '../utils/calculations';
 
 interface ResultViewProps {
@@ -159,7 +160,7 @@ export default function ResultView({ onNavigate, testedInstallment, financials, 
               {/* After */}
               <div className="space-y-1">
                 <div className="flex justify-between text-[11px]">
-                  <span className="text-slate-500 font-medium">بعد التزام {testedInstallment.toLocaleString()} ر.س</span>
+                  <span className="text-slate-500 font-medium">بعد التزام {testedInstallment.toLocaleString()} <RiyalSymbol className="mr-1 text-slate-400" /></span>
                   <span className={`font-bold ${afterRatioVal > 45 ? 'text-red-600' : afterRatioVal > 33 ? 'text-brand-clay' : 'text-brand-success'}`}>{afterRatioVal}%</span>
                 </div>
                 <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden">

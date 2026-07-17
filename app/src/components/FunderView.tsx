@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Landmark, CheckCircle, ShieldCheck, XCircle, Search, HelpCircle, Lock, AlertCircle, FileText, Calendar, Percent } from 'lucide-react';
-import { ScreenId, UserFinancials } from '../types';
+import { ScreenId, UserFinancials, Certificate } from '../types';
+import RiyalSymbol from './RiyalSymbol';
 
 interface FunderViewProps {
   onNavigate: (screenId: ScreenId) => void;
@@ -8,31 +9,47 @@ interface FunderViewProps {
   initialVerificationId?: string;
   financials: UserFinancials | null;
   loading: boolean;
+  certificate: Certificate | null;
+  onAcceptCertificate: (bankName: string) => void;
+  onResetCertificate: () => void;
 }
 
-export default function FunderView({ onNavigate, testedInstallment, initialVerificationId, financials, loading }: FunderViewProps) {
-  const [searchId, setSearchId] = useState(initialVerificationId || 'QDH-2026-0182');
-  const [isValidated, setIsValidated] = useState(
-    initialVerificationId 
-      ? initialVerificationId.trim().toUpperCase() === 'QDH-2026-0182' 
-      : true
-  );
+export default function FunderView({ 
+  onNavigate, 
+  testedInstallment, 
+  initialVerificationId, 
+  financials, 
+  loading, 
+  certificate,
+  onAcceptCertificate,
+  onResetCertificate
+}: FunderViewProps) {
+  const [searchId, setSearchId] = useState('');
+  const [isValidated, setIsValidated] = useState(true);
   const [searchTriggered, setSearchTriggered] = useState(true);
+  const [selectedBank, setSelectedBank] = useState('بنك الراجحي');
 
-  // Update state and validate when initialVerificationId changes
+  // Update state and validate when initialVerificationId or certificate changes
   useEffect(() => {
     if (initialVerificationId) {
       setSearchId(initialVerificationId);
-      setIsValidated(initialVerificationId.trim().toUpperCase() === 'QDH-2026-0182');
+      const isMatch = (certificate && initialVerificationId.trim().toUpperCase() === certificate.verificationId.toUpperCase()) ||
+                      initialVerificationId.trim().toUpperCase() === 'QDH-2026-0182';
+      setIsValidated(isMatch);
+      setSearchTriggered(true);
+    } else if (certificate) {
+      setSearchId(certificate.verificationId);
+      setIsValidated(true);
       setSearchTriggered(true);
     }
-  }, [initialVerificationId]);
+  }, [initialVerificationId, certificate]);
 
   const handleValidate = (e: React.FormEvent) => {
     e.preventDefault();
     setSearchTriggered(true);
-    // Simulation: if searchId matches our mock, it validates successfully
-    if (searchId.trim().toUpperCase() === 'QDH-2026-0182') {
+    if (certificate && searchId.trim().toUpperCase() === certificate.verificationId.toUpperCase()) {
+      setIsValidated(true);
+    } else if (searchId.trim().toUpperCase() === 'QDH-2026-0182') {
       setIsValidated(true);
     } else {
       setIsValidated(false);
@@ -105,7 +122,61 @@ export default function FunderView({ onNavigate, testedInstallment, initialVerif
       {/* Verification Result details */}
       {searchTriggered && (
         <div className="space-y-6">
-          {isValidated ? (
+          {!isValidated ? (
+            /* Expired/Revoked/Invalid certificate simulation */
+            <div className="bg-white rounded-3xl border-2 border-brand-danger p-8 shadow-lg text-center space-y-4 animate-fadeIn">
+              <div className="w-12 h-12 rounded-full bg-brand-danger/10 text-brand-danger flex items-center justify-center mx-auto">
+                <XCircle className="w-8 h-8" />
+              </div>
+              <h3 className="text-lg font-black text-brand-navy">توثيق غير صحيح أو غير مسجل</h3>
+              <p className="text-xs text-slate-500 max-w-md mx-auto">
+                رمز التحقق <span className="font-bold text-brand-danger font-mono">"{searchId.toUpperCase()}"</span> غير مسجل في قواعد بيانات المصرفية المفتوحة المعتمدة لمنصة قدها. يرجى التحقق من صحة الرمز.
+              </p>
+            </div>
+          ) : certificate && certificate.status === 'expired' ? (
+            /* Expired Certificate layout */
+            <div className="bg-white rounded-3xl border-2 border-red-500 p-8 shadow-lg text-center space-y-4 animate-fadeIn">
+              <div className="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center mx-auto">
+                <XCircle className="w-8 h-8" />
+              </div>
+              <h3 className="text-lg font-black text-brand-navy">توثيق منتهي الصلاحية</h3>
+              <p className="text-xs text-slate-500 max-w-md mx-auto">
+                هذا التوثيق (رمز: <span className="font-bold text-red-600 font-mono">{searchId.toUpperCase()}</span>) انتهت صلاحيته بتاريخ <span className="font-bold">{certificate.expiryDate}</span>. صلاحية شهادات قدها هي شهر واحد فقط من تاريخ الإصدار.
+              </p>
+              <div className="pt-4 border-t border-brand-gray flex justify-center gap-4">
+                <button
+                  type="button"
+                  onClick={onResetCertificate}
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-brand-navy font-bold text-xs rounded-xl cursor-pointer"
+                >
+                  إعادة تفعيل الشهادة (للتجربة)
+                </button>
+              </div>
+            </div>
+          ) : certificate && certificate.status === 'used' ? (
+            /* Already Used/Accepted Certificate layout */
+            <div className="bg-white rounded-3xl border-2 border-amber-500 p-8 shadow-lg text-center space-y-4 animate-fadeIn">
+              <div className="w-12 h-12 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center mx-auto">
+                <AlertCircle className="w-8 h-8" />
+              </div>
+              <h3 className="text-lg font-black text-brand-navy">الشهادة تم استخدامها مسبقاً للحصول على تمويل</h3>
+              <p className="text-xs text-slate-600 max-w-lg mx-auto">
+                رمز التوثيق <span className="font-bold text-brand-navy font-mono">{searchId.toUpperCase()}</span> تم قبوله مسبقاً وصرف تمويل بموجبه لصالح جهة <span className="font-bold text-brand-indigo">({certificate.acceptedBy})</span> بتاريخ <span className="font-bold">{certificate.acceptedDate}</span>.
+              </p>
+              <p className="text-xs text-red-600 font-extrabold max-w-md mx-auto leading-normal">
+                حمايةً من مخاطر التعثر المالي وتكرار التمويل، لا يمكن استخدام الشهادة الرقمية نفسها للحصول على تمويل إضافي من أي جهة أخرى.
+              </p>
+              <div className="pt-4 border-t border-brand-gray flex justify-center gap-4">
+                <button
+                  type="button"
+                  onClick={onResetCertificate}
+                  className="px-4 py-2 bg-brand-navy text-white hover:bg-brand-indigo font-bold text-xs rounded-xl cursor-pointer"
+                >
+                  إلغاء القبول وإعادة تفعيل الشهادة (للتجربة)
+                </button>
+              </div>
+            </div>
+          ) : (
             /* Valid Certificate layout (Highly formal deep navy borders) */
             <div className="bg-white rounded-3xl border-2 border-brand-navy p-6 sm:p-10 shadow-lg space-y-8 animate-fadeIn">
               
@@ -157,7 +228,7 @@ export default function FunderView({ onNavigate, testedInstallment, initialVerif
                   <span className="text-xs text-slate-400 font-bold block">نطاق القسط المختبر</span>
                   
                   <div className="space-y-1">
-                    <span className="text-xl font-bold font-mono text-brand-navy block">{testedInstallment.toLocaleString()} ر.س</span>
+                    <span className="text-xl font-bold font-mono text-brand-navy block">{testedInstallment.toLocaleString()} <RiyalSymbol className="mr-1 text-slate-500" /></span>
                     <span className="text-[10px] text-slate-500 block">شهرياً كقسط تمويل مستهدف للتقييم</span>
                   </div>
                   
@@ -193,7 +264,7 @@ export default function FunderView({ onNavigate, testedInstallment, initialVerif
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
                   <div className="flex justify-between p-3 bg-slate-50 rounded-xl">
-                    <span className="font-extrabold font-mono text-brand-navy">{financials.avgMonthlyIncome12m.toLocaleString()} ر.س</span>
+                    <span className="font-extrabold font-mono text-brand-navy">{financials.avgMonthlyIncome12m.toLocaleString()} <RiyalSymbol className="mr-1 text-slate-500" /></span>
                     <span className="text-slate-500">متوسط الدخل الشهري الفعلي للسنة (12 شهر):</span>
                   </div>
                   <div className="flex justify-between p-3 bg-slate-50 rounded-xl">
@@ -203,13 +274,55 @@ export default function FunderView({ onNavigate, testedInstallment, initialVerif
                     <span className="text-slate-500">مؤشر تذبذب الدخل الشهري:</span>
                   </div>
                   <div className="flex justify-between p-3 bg-slate-50 rounded-xl">
-                    <span className="font-extrabold font-mono text-brand-navy">{financials.monthlyObligations.toLocaleString()} ر.س</span>
+                    <span className="font-extrabold font-mono text-brand-navy">{financials.monthlyObligations.toLocaleString()} <RiyalSymbol className="mr-1 text-slate-500" /></span>
                     <span className="text-slate-500">الالتزامات البنكية والقروض الأخرى القائمة:</span>
                   </div>
                   <div className="flex justify-between p-3 bg-slate-50 rounded-xl">
-                    <span className="font-extrabold font-mono text-brand-navy">{(financials.avgMonthlyIncome12m - financials.monthlyObligations - testedInstallment - financials.avgMonthlyExpenses).toLocaleString()} ر.س</span>
+                    <span className="font-extrabold font-mono text-brand-navy">{(financials.avgMonthlyIncome12m - financials.monthlyObligations - testedInstallment - financials.avgMonthlyExpenses).toLocaleString()} <RiyalSymbol className="mr-1 text-slate-500" /></span>
                     <span className="text-slate-500">متوسط الفائض المالي المتاح شهرياً:</span>
                   </div>
+                </div>
+              </div>
+
+              {/* Action Panel for Funder to accept certificate and grant loan */}
+              <div className="bg-brand-navy/5 border border-brand-navy/10 p-6 rounded-2xl space-y-4 text-right">
+                <div className="flex items-center gap-2 flex-row-reverse justify-between">
+                  <div className="flex items-center gap-2 flex-row-reverse">
+                    <Landmark className="w-5 h-5 text-brand-purple shrink-0" />
+                    <h4 className="text-xs font-black text-brand-navy">إجراءات جهة التمويل المعتمدة:</h4>
+                  </div>
+                  <span className="text-[10px] text-brand-success font-bold bg-brand-success/10 px-2 py-0.5 rounded-full">
+                    متاحة للاستخدام وقبول القرض
+                  </span>
+                </div>
+                <p className="text-[11px] text-slate-500">
+                  بصفتك جهة تمويلية معتمدة، يمكنك اعتماد الشهادة وصرف القرض بموجبها. بمجرد تأكيد الصرف، سيتم وسم الشهادة كـ "مستعملة ومقبولة" ولن تكون قابلة للتقديم لأي جهة تمويل أخرى.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                  <div className="flex-1 space-y-1">
+                    <label className="text-[10px] font-bold text-slate-500 block">اسم الجهة التمويلية المقرضة:</label>
+                    <select
+                      value={selectedBank}
+                      onChange={(e) => setSelectedBank(e.target.value)}
+                      className="w-full px-3 py-2 text-xs font-bold text-brand-navy bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-brand-purple cursor-pointer"
+                    >
+                      <option value="بنك الراجحي">بنك الراجحي</option>
+                      <option value="البنك الأهلي السعودي">البنك الأهلي السعودي</option>
+                      <option value="بنك الرياض">بنك الرياض</option>
+                      <option value="شركة إمكان للتمويل">شركة إمكان للتمويل</option>
+                      <option value="شركة تام للتمويل">شركة تام للتمويل</option>
+                    </select>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onAcceptCertificate(selectedBank);
+                    }}
+                    className="sm:self-end px-6 py-2.5 rounded-xl bg-brand-success hover:bg-emerald-600 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                  >
+                    <CheckCircle className="w-4 h-4" />
+                    <span>قبول الشهادة واعتماد صرف القرض</span>
+                  </button>
                 </div>
               </div>
 
@@ -224,17 +337,6 @@ export default function FunderView({ onNavigate, testedInstallment, initialVerif
                 </div>
               </div>
 
-            </div>
-          ) : (
-            /* Expired/Revoked/Invalid certificate simulation */
-            <div className="bg-white rounded-3xl border-2 border-brand-danger p-8 shadow-lg text-center space-y-4 animate-fadeIn">
-              <div className="w-12 h-12 rounded-full bg-brand-danger/10 text-brand-danger flex items-center justify-center mx-auto">
-                <XCircle className="w-8 h-8" />
-              </div>
-              <h3 className="text-lg font-black text-brand-navy">توثيق غير متاح أو منتهي الصلاحية</h3>
-              <p className="text-xs text-slate-500 max-w-md mx-auto">
-                رمز التحقق <span className="font-bold text-brand-danger font-mono">"{searchId.toUpperCase()}"</span> قد يكون ملغى من قبل المستخدم أو غير مسجل في قواعد بيانات المصرفية المفتوحة المعتمدة.
-              </p>
             </div>
           )}
         </div>

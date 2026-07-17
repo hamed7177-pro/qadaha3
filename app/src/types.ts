@@ -55,3 +55,12 @@ export interface ChatMessage {
   text: string;
   timestamp: string;
 }
+
+export interface Certificate {
+  verificationId: string;
+  issueDate: string;
+  expiryDate: string;
+  status: 'active' | 'used' | 'expired';
+  acceptedBy?: string;
+  acceptedDate?: string;
+}

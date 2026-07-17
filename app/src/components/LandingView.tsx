@@ -1,6 +1,7 @@
 import React from 'react';
 import { Shield, Sparkles, TrendingUp, CheckCircle2, ChevronLeft, ArrowLeft } from 'lucide-react';
 import { ScreenId } from '../types';
+import RiyalSymbol from './RiyalSymbol';
 
 interface LandingViewProps {
   onNavigate: (screenId: ScreenId) => void;
@@ -22,7 +23,7 @@ export default function LandingView({ onNavigate }: LandingViewProps) {
           <div className="lg:col-span-7 space-y-8 text-right">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand-indigo/10 border border-brand-purple/20 text-brand-purple text-xs font-semibold">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>هاكاثون أمد للتقنية المالية 2026</span>
+              <span>منصة قدها للملاءة المالية الذكية</span>
             </div>
             
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-brand-navy leading-tight">
@@ -120,7 +121,7 @@ export default function LandingView({ onNavigate }: LandingViewProps) {
               <div className="space-y-3.5 border-t border-white/10 pt-4 text-xs">
                 <div className="flex justify-between">
                   <span className="text-white/60">القسط المستهدف للتقييم:</span>
-                  <span className="font-bold">1,200 ر.س / شهرياً</span>
+                  <span className="font-bold font-mono">1,200 <RiyalSymbol className="mr-1 text-white/80" /> / شهرياً</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-white/60">نسبة الالتزامات المقدرة:</span>

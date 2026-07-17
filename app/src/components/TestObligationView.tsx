@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Sparkles, HelpCircle, ArrowLeft, ArrowRight, ShieldCheck, ChevronLeft, CreditCard, Landmark, Percent } from 'lucide-react';
 import { ScreenId, UserFinancials } from '../types';
+import RiyalSymbol from './RiyalSymbol';
 
 interface TestObligationViewProps {
   onNavigate: (screenId: ScreenId) => void;
@@ -118,8 +119,8 @@ export default function TestObligationView({
             {/* Input 2: Installment Amount */}
             <div className="space-y-1.5 text-right">
               <div className="flex justify-between items-baseline">
-                <span className="text-[10px] text-slate-400">مثال: 1,200 ر.س</span>
-                <label className="text-xs font-bold text-brand-navy">قيمة القسط الشهري المختبر (ر.س)</label>
+                <span className="text-[10px] text-slate-400">مثال: 1,200 <RiyalSymbol className="text-slate-400" /></span>
+                <label className="text-xs font-bold text-brand-navy">قيمة القسط الشهري المختبر (<RiyalSymbol className="text-slate-400" />)</label>
               </div>
               <div className="relative">
                 <input 
@@ -129,7 +130,7 @@ export default function TestObligationView({
                   className="w-full px-4 py-3 rounded-xl border border-brand-gray text-sm font-bold text-brand-navy focus:outline-none focus:border-brand-purple font-mono"
                   placeholder="1200"
                 />
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">ر.س</span>
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400"><RiyalSymbol className="text-slate-400" /></span>
               </div>
             </div>
 
@@ -208,7 +209,7 @@ export default function TestObligationView({
             <div className="space-y-4">
               <div className="space-y-1">
                 <span className="text-xs text-white/50 block">متوسط دخلك الفعلي</span>
-                <span className="text-xl font-bold font-mono">11,800 ر.س</span>
+                <span className="text-xl font-bold font-mono">11,800 <RiyalSymbol className="mr-1 text-white/60" /></span>
               </div>
 
               {/* Progress visual comparison before & after */}
@@ -245,8 +246,8 @@ export default function TestObligationView({
                 <Percent className="w-4 h-4 shrink-0" />
                 <span className="font-bold">أثر القسط المالي الجديد</span>
               </div>
-              <p className="text-white/80 leading-relaxed">
-                قسط الالتزام الجديد بقيمة <span className="font-bold text-white">{installment.toLocaleString()} ر.س</span> يرفع نسبة التزاماتك من <span className="font-bold text-brand-success">{originalRatio.toFixed(0)}%</span> إلى <span className="font-bold text-brand-clay">{obligationRatio.toFixed(0)}%</span> من متوسط دخلك الشهري. هذا المؤشر يضع ملاءتك تحت الملاحظة.
+              <p className="text-white/80 leading-relaxed font-mono">
+                قسط الالتزام الجديد بقيمة <span className="font-bold text-white">{installment.toLocaleString()} <RiyalSymbol className="mr-1 text-white/80" /></span> يرفع نسبة التزاماتك من <span className="font-bold text-brand-success">{originalRatio.toFixed(0)}%</span> إلى <span className="font-bold text-brand-clay">{obligationRatio.toFixed(0)}%</span> من متوسط دخلك الشهري. هذا المؤشر يضع ملاءتك تحت الملاحظة.
               </p>
             </div>
 

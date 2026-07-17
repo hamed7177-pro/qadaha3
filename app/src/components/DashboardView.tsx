@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Sparkles, Calendar, ArrowUpRight, TrendingUp, DollarSign, PieChart, ShieldCheck, ChevronLeft, ArrowDownRight, Clock } from 'lucide-react';
 import { ScreenId, Transaction, UserFinancials } from '../types';
+import RiyalSymbol from './RiyalSymbol';
 
 interface DashboardViewProps {
   onNavigate: (screenId: ScreenId) => void;
@@ -44,19 +45,33 @@ export default function DashboardView({ onNavigate, financials, loading }: Dashb
 
   // Use the monthly history from backend or fallback to static
   const monthlyIncome = financials.monthlyIncomeHistory || [11800, 11800, 11800, 11800, 11800, 11800, 11800, 11800, 11800, 11800, 11800, 11800];
-  const maxIncome = Math.max(...monthlyIncome);
-  const minIncome = Math.min(...monthlyIncome);
-  
-  const points = monthlyIncome.map((val, idx) => {
+  const monthlyExpenses = financials.monthlyExpensesHistory || [8500, 9200, 7800, 8900, 9500, 8100, 8400, 9000, 8700, 9100, 8300, 8600];
+
+  const allValues = [...monthlyIncome, ...monthlyExpenses];
+  const maxValue = Math.max(...allValues);
+  const minValue = Math.min(...allValues);
+  const range = maxValue - minValue || 1000;
+
+  const incomePoints = monthlyIncome.map((val, idx) => {
     const x = padding + (idx * (width - padding * 2)) / (monthlyIncome.length - 1);
-    const range = maxIncome - minIncome || 1000;
-    const y = height - padding - ((val - (minIncome - range * 0.1)) * (height - padding * 2)) / (range * 1.2);
-    return { x, y, value: val, month: monthLabels[idx] };
+    const y = height - padding - ((val - (minValue - range * 0.1)) * (height - padding * 2)) / (range * 1.2);
+    return { x, y, value: val, month: monthLabels[idx], type: 'income' };
   });
 
-  const pathD = `M ${points[0].x} ${points[0].y} ` + points.slice(1).map(p => `L ${p.x} ${p.y}`).join(' ');
+  const expensePoints = monthlyExpenses.map((val, idx) => {
+    const x = padding + (idx * (width - padding * 2)) / (monthlyExpenses.length - 1);
+    const y = height - padding - ((val - (minValue - range * 0.1)) * (height - padding * 2)) / (range * 1.2);
+    return { x, y, value: val, month: monthLabels[idx], type: 'expense' };
+  });
 
-  const [activePoint, setActivePoint] = useState<any>(null);
+  const incomePathD = `M ${incomePoints[0].x} ${incomePoints[0].y} ` + incomePoints.slice(1).map(p => `L ${p.x} ${p.y}`).join(' ');
+  const expensePathD = `M ${expensePoints[0].x} ${expensePoints[0].y} ` + expensePoints.slice(1).map(p => `L ${p.x} ${p.y}`).join(' ');
+
+  const topLabel = `${(maxValue / 1000).toFixed(1)}k`;
+  const midLabel = `${((maxValue + minValue) / 2 / 1000).toFixed(1)}k`;
+  const botLabel = `${(minValue / 1000).toFixed(1)}k`;
+
+  const [activeMonthIdx, setActiveMonthIdx] = useState<number | null>(null);
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 space-y-8 text-right">
@@ -90,7 +105,7 @@ export default function DashboardView({ onNavigate, financials, loading }: Dashb
         <div className="bg-white rounded-2xl p-6 border border-brand-gray shadow-sm space-y-3">
           <span className="text-xs text-slate-400 font-bold block">متوسط الدخل الشهري (12 شهر)</span>
           <div className="flex justify-between items-baseline">
-            <span className="text-2xl font-black text-brand-navy font-mono">{avgIncome.toLocaleString()} ر.س</span>
+            <span className="text-2xl font-black text-brand-navy font-mono">{avgIncome.toLocaleString()} <RiyalSymbol className="mr-1 text-slate-500" /></span>
             <span className="text-xs text-brand-success font-bold flex items-center gap-0.5">
               <ArrowUpRight className="w-3 h-3" />
               <span>{financials.incomeVolatilityScore <= 15 ? 'مستقر' : 'متذبذب'}</span>
@@ -103,7 +118,7 @@ export default function DashboardView({ onNavigate, financials, loading }: Dashb
         <div className="bg-white rounded-2xl p-6 border border-brand-gray shadow-sm space-y-3">
           <span className="text-xs text-slate-400 font-bold block">الالتزامات البنكية القائمة</span>
           <div className="flex justify-between items-baseline">
-            <span className="text-2xl font-black text-brand-navy font-mono">{avgObligations.toLocaleString()} ر.س</span>
+            <span className="text-2xl font-black text-brand-navy font-mono">{avgObligations.toLocaleString()} <RiyalSymbol className="mr-1 text-slate-500" /></span>
             <span className="text-xs text-brand-clay font-bold flex items-center gap-0.5">
               <span>{((avgObligations / avgIncome) * 100).toFixed(0)}% من الدخل</span>
             </span>
@@ -115,7 +130,7 @@ export default function DashboardView({ onNavigate, financials, loading }: Dashb
         <div className="bg-white rounded-2xl p-6 border border-brand-gray shadow-sm space-y-3">
           <span className="text-xs text-slate-400 font-bold block">الفائض المالي الشهري المتاح</span>
           <div className="flex justify-between items-baseline">
-            <span className="text-2xl font-black text-brand-navy font-mono">{avgSurplus.toLocaleString()} ر.س</span>
+            <span className="text-2xl font-black text-brand-navy font-mono">{avgSurplus.toLocaleString()} <RiyalSymbol className="mr-1 text-slate-500" /></span>
             <span className="text-xs text-brand-success font-bold flex items-center gap-0.5">
               <span>{avgSurplus > 0 ? 'إيجابي' : 'سلبي'}</span>
             </span>
@@ -144,12 +159,18 @@ export default function DashboardView({ onNavigate, financials, loading }: Dashb
         <div className="lg:col-span-8 bg-white rounded-3xl p-6 border border-brand-gray shadow-sm space-y-6">
           <div className="flex justify-between items-center flex-row-reverse">
             <div>
-              <h3 className="text-lg font-bold text-brand-navy">منحنى التدفق النقدي الوارد (السنة الماضية)</h3>
-              <p className="text-xs text-slate-400">تغير ومحاكاة الدخل الشهري الفعلي لـ {financials.name.split(' ')[0]} على مدار 12 شهراً</p>
+              <h3 className="text-lg font-bold text-brand-navy">منحنى التدفقات النقدية (السنة الماضية)</h3>
+              <p className="text-xs text-slate-400">مقارنة التدفقات النقدية الداخلة (الواردة) والخارجة (الصادرة) شهرياً لـ {financials.name.split(' ')[0]}</p>
             </div>
-            <div className="flex items-center gap-1 text-xs text-slate-500">
-              <span className="w-2.5 h-2.5 rounded-full bg-brand-clay block"></span>
-              <span>الدخل ر.س</span>
+            <div className="flex items-center gap-4 text-xs font-semibold">
+              <div className="flex items-center gap-1.5 flex-row-reverse">
+                <span className="w-3 h-3 rounded-full bg-brand-purple block"></span>
+                <span className="text-slate-600">التدفق الداخل (الوارد)</span>
+              </div>
+              <div className="flex items-center gap-1.5 flex-row-reverse">
+                <span className="w-3 h-3 rounded-full bg-brand-clay block"></span>
+                <span className="text-slate-600">التدفق الخارج (الصادر)</span>
+              </div>
             </div>
           </div>
 
@@ -163,73 +184,166 @@ export default function DashboardView({ onNavigate, financials, loading }: Dashb
                 <line x1={padding} y1={height - padding} x2={width - padding} y2={height - padding} stroke="#cbd5e1" strokeWidth="1" />
 
                 {/* Grid Values Labels */}
-                <text x={padding - 5} y={padding + 4} textAnchor="end" fill="#94a3b8" className="text-[10px] font-mono">14k</text>
-                <text x={padding - 5} y={height / 2 + 4} textAnchor="end" fill="#94a3b8" className="text-[10px] font-mono">10k</text>
-                <text x={padding - 5} y={height - padding + 4} textAnchor="end" fill="#94a3b8" className="text-[10px] font-mono">6k</text>
+                <text x={padding - 5} y={padding + 4} textAnchor="end" fill="#94a3b8" className="text-[10px] font-mono">{topLabel}</text>
+                <text x={padding - 5} y={height / 2 + 4} textAnchor="end" fill="#94a3b8" className="text-[10px] font-mono">{midLabel}</text>
+                <text x={padding - 5} y={height - padding + 4} textAnchor="end" fill="#94a3b8" className="text-[10px] font-mono">{botLabel}</text>
 
-                {/* Main Path */}
+                {/* Path Gradients Definition */}
+                <defs>
+                  <linearGradient id="income-grad" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stopColor="#8F8BEA" />
+                    <stop offset="100%" stopColor="#24234F" />
+                  </linearGradient>
+                  <linearGradient id="expense-grad" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stopColor="#C86B4F" />
+                    <stop offset="100%" stopColor="#E11D48" />
+                  </linearGradient>
+                </defs>
+
+                {/* Income Path */}
                 <path
-                  d={pathD}
+                  d={incomePathD}
                   fill="none"
-                  stroke="url(#line-grad)"
+                  stroke="url(#income-grad)"
                   strokeWidth="3.5"
                   strokeLinecap="round"
                   className="animate-drawPath"
                 />
 
-                {/* Path Gradient Definition */}
-                <defs>
-                  <linearGradient id="line-grad" x1="0" y1="0" x2="1" y2="0">
-                    <stop offset="0%" stopColor="#8F8BEA" />
-                    <stop offset="50%" stopColor="#C86B4F" />
-                    <stop offset="100%" stopColor="#071B33" />
-                  </linearGradient>
-                </defs>
+                {/* Expense Path */}
+                <path
+                  d={expensePathD}
+                  fill="none"
+                  stroke="url(#expense-grad)"
+                  strokeWidth="3.5"
+                  strokeLinecap="round"
+                  className="animate-drawPath opacity-80"
+                />
 
-                {/* Chart Dots & Interactive Hover Regions */}
-                {points.map((p, i) => (
-                  <g key={i}>
-                    <circle
-                      cx={p.x}
-                      cy={p.y}
-                      r="4"
-                      className="fill-white stroke-brand-clay stroke-[2] cursor-pointer hover:scale-150 transition-transform"
-                      onMouseEnter={() => setActivePoint(p)}
-                      onMouseLeave={() => setActivePoint(null)}
-                    />
-                    {/* X Axis Labels */}
-                    <text
-                      x={p.x}
-                      y={height - padding + 16}
-                      textAnchor="middle"
-                      fill="#64748b"
-                      className="text-[9px] font-semibold"
-                    >
-                      {p.month}
-                    </text>
-                  </g>
+                {/* Active Column Dotted Line */}
+                {activeMonthIdx !== null && (
+                  <line
+                    x1={incomePoints[activeMonthIdx].x}
+                    y1={padding}
+                    x2={incomePoints[activeMonthIdx].x}
+                    y2={height - padding}
+                    stroke="#cbd5e1"
+                    strokeWidth="1.5"
+                    strokeDasharray="4 4"
+                    pointerEvents="none"
+                  />
+                )}
+
+                {/* Income Dots */}
+                {incomePoints.map((p, i) => (
+                  <circle
+                    key={`inc-${i}`}
+                    cx={p.x}
+                    cy={p.y}
+                    r={activeMonthIdx === i ? "5.5" : "4"}
+                    className={`fill-white stroke-brand-purple ${activeMonthIdx === i ? "stroke-[3]" : "stroke-[2]"} transition-all`}
+                    pointerEvents="none"
+                  />
                 ))}
 
-                {/* SVG Tooltip showing hover point value */}
-                {activePoint && (
-                  <g>
+                {/* Expense Dots */}
+                {expensePoints.map((p, i) => (
+                  <circle
+                    key={`exp-${i}`}
+                    cx={p.x}
+                    cy={p.y}
+                    r={activeMonthIdx === i ? "5.5" : "4"}
+                    className={`fill-white stroke-brand-clay ${activeMonthIdx === i ? "stroke-[3]" : "stroke-[2]"} transition-all`}
+                    pointerEvents="none"
+                  />
+                ))}
+
+                {/* Transparent Hover Columns */}
+                {incomePoints.map((p, i) => {
+                  const barWidth = (width - padding * 2) / (incomePoints.length - 1);
+                  return (
                     <rect
-                      x={activePoint.x - 45}
-                      y={activePoint.y - 35}
-                      width="90"
-                      height="24"
-                      rx="6"
-                      fill="#071B33"
-                      className="opacity-95"
+                      key={`hover-${i}`}
+                      x={p.x - barWidth / 2}
+                      y={0}
+                      width={barWidth}
+                      height={height}
+                      fill="transparent"
+                      className="cursor-pointer"
+                      onMouseEnter={() => setActiveMonthIdx(i)}
+                      onMouseLeave={() => setActiveMonthIdx(null)}
                     />
+                  );
+                })}
+
+                {/* X Axis Labels */}
+                {incomePoints.map((p, i) => (
+                  <text
+                    key={`lbl-${i}`}
+                    x={p.x}
+                    y={height - padding + 16}
+                    textAnchor="middle"
+                    fill={activeMonthIdx === i ? "#071B33" : "#64748b"}
+                    className={`text-[9px] ${activeMonthIdx === i ? "font-black" : "font-semibold"} transition-all`}
+                    pointerEvents="none"
+                  >
+                    {p.month}
+                  </text>
+                ))}
+
+                {/* Combined Tooltip showing both incoming and outgoing values for active month */}
+                {activeMonthIdx !== null && (
+                  <g pointerEvents="none" className="z-30">
+                    <rect
+                      x={
+                        incomePoints[activeMonthIdx].x + 
+                        (activeMonthIdx > 8 ? -135 : activeMonthIdx < 3 ? 15 : -60)
+                      }
+                      y={padding}
+                      width="120"
+                      height="60"
+                      rx="8"
+                      fill="#071B33"
+                      className="opacity-95 shadow-lg"
+                    />
+                    {/* Tooltip Title: Month name */}
                     <text
-                      x={activePoint.x}
-                      y={activePoint.y - 20}
+                      x={
+                        incomePoints[activeMonthIdx].x + 
+                        (activeMonthIdx > 8 ? -75 : activeMonthIdx < 3 ? 75 : 0)
+                      }
+                      y={padding + 16}
                       textAnchor="middle"
                       fill="#ffffff"
-                      className="text-[10px] font-bold font-mono"
+                      className="text-[9px] font-black"
                     >
-                      {activePoint.value.toLocaleString()} ر.س
+                      شهر {monthLabels[activeMonthIdx]}
+                    </text>
+                    {/* Income value */}
+                    <text
+                      x={
+                        incomePoints[activeMonthIdx].x + 
+                        (activeMonthIdx > 8 ? -75 : activeMonthIdx < 3 ? 75 : 0)
+                      }
+                      y={padding + 32}
+                      textAnchor="middle"
+                      fill="#8F8BEA"
+                      className="text-[9px] font-bold"
+                    >
+                      الوارد: {monthlyIncome[activeMonthIdx].toLocaleString()} ⃁
+                    </text>
+                    {/* Expense value */}
+                    <text
+                      x={
+                        incomePoints[activeMonthIdx].x + 
+                        (activeMonthIdx > 8 ? -75 : activeMonthIdx < 3 ? 75 : 0)
+                      }
+                      y={padding + 48}
+                      textAnchor="middle"
+                      fill="#C86B4F"
+                      className="text-[9px] font-bold"
+                    >
+                      الصادر: {monthlyExpenses[activeMonthIdx].toLocaleString()} ⃁
                     </text>
                   </g>
                 )}
@@ -266,7 +380,7 @@ export default function DashboardView({ onNavigate, financials, loading }: Dashb
               
               <div className="absolute text-center">
                 <span className="text-xs text-slate-400 block">إجمالي الصرف</span>
-                <span className="text-sm font-black font-mono text-brand-navy">{avgExpenses.toLocaleString()} ر.س</span>
+                <span className="text-sm font-black font-mono text-brand-navy">{avgExpenses.toLocaleString()} <RiyalSymbol className="mr-0.5 text-slate-500" /></span>
               </div>
             </div>
 
@@ -278,7 +392,7 @@ export default function DashboardView({ onNavigate, financials, loading }: Dashb
                     <span className="text-slate-600">{c.name}</span>
                   </div>
                   <div className="flex gap-2 items-center font-mono">
-                    <span className="font-bold text-brand-navy">{c.value.toLocaleString()} ر.س</span>
+                    <span className="font-bold text-brand-navy">{c.value.toLocaleString()} <RiyalSymbol className="mr-0.5 text-slate-400" /></span>
                     <span className="text-slate-400">({c.percentage})</span>
                   </div>
                 </div>
@@ -307,7 +421,7 @@ export default function DashboardView({ onNavigate, financials, loading }: Dashb
               </div>
             </div>
             <div className="text-left font-mono">
-              <span className="text-sm font-black block text-brand-navy">{(avgObligations > 250 ? avgObligations - 250 : avgObligations).toLocaleString()} ر.س</span>
+              <span className="text-sm font-black block text-brand-navy">{(avgObligations > 250 ? avgObligations - 250 : avgObligations).toLocaleString()} <RiyalSymbol className="mr-0.5 text-slate-500" /></span>
               <span className="text-[10px] text-slate-400 block">يوم 27 من كل شهر</span>
             </div>
           </div>
@@ -323,7 +437,7 @@ export default function DashboardView({ onNavigate, financials, loading }: Dashb
               </div>
             </div>
             <div className="text-left font-mono">
-              <span className="text-sm font-black block text-brand-navy">{(avgObligations > 250 ? 250 : 0).toLocaleString()} ر.س</span>
+              <span className="text-sm font-black block text-brand-navy">{(avgObligations > 250 ? 250 : 0).toLocaleString()} <RiyalSymbol className="mr-0.5 text-slate-500" /></span>
               <span className="text-[10px] text-slate-400 block">متوسط صرف متكرر</span>
             </div>
           </div>
