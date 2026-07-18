@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   ShieldCheck, Landmark, Lock, Menu, X, ArrowLeftRight, HelpCircle,
-  ChevronLeft, CreditCard, Sparkles, Home, LayoutDashboard, Link2,
+  ChevronLeft, ChevronRight, CreditCard, Sparkles, Home, LayoutDashboard, Link2,
   Calculator, Award, MessageSquare, LogOut, Check, Sun, Moon
 } from 'lucide-react';
 import { ScreenId, Certificate, UserFinancials } from './types';
@@ -22,6 +22,7 @@ export default function App() {
    const [currentScreen, setCurrentScreen] = useState<ScreenId>('landing');
   const [testedInstallment, setTestedInstallment] = useState<number>(1200);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [desktopSidebarOpen, setDesktopSidebarOpen] = useState(true);
   const [initialVerificationId, setInitialVerificationId] = useState<string>('');
 
   const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
@@ -308,13 +309,20 @@ export default function App() {
       <div className="space-y-8">
 
         {/* Brand Logo & Name */}
-        <div className="flex items-center">
+        <div className="flex items-center justify-between gap-2">
           <img
             src="/logo.png"
             alt="Qadaha Logo"
             onClick={() => handleNavigate('landing')}
             className="h-12 cursor-pointer object-contain hover:scale-105 transition-transform shrink-0"
           />
+          <button
+            onClick={() => setDesktopSidebarOpen(false)}
+            className="hidden lg:flex p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-colors cursor-pointer"
+            title="إخفاء الشريط الجانبي"
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
         </div>
 
         {/* Sandbox Status Badge */}
@@ -448,12 +456,23 @@ export default function App() {
     <div className="min-h-screen bg-brand-bg flex text-right font-sans selection:bg-brand-purple/20 relative overflow-x-hidden" dir="rtl">
 
       {/* 1. Desktop Fixed Sidebar */}
-      <aside className="hidden lg:flex flex-col w-72 bg-brand-navy text-white h-screen fixed top-0 right-0 z-40 border-l border-white/5 no-print overflow-y-auto scrollbar-thin">
+      <aside className={`hidden lg:flex flex-col w-72 bg-brand-navy text-white h-screen fixed top-0 right-0 z-40 border-l border-white/5 no-print overflow-y-auto scrollbar-thin transition-all duration-300 ${desktopSidebarOpen ? 'translate-x-0' : 'translate-x-full'}`}>
         <SidebarContent />
       </aside>
 
       {/* 2. Main Workspace Container */}
-      <div className="flex-1 flex flex-col lg:mr-72 min-h-screen min-w-0 max-w-full">
+      <div className={`flex-1 flex flex-col min-h-screen min-w-0 max-w-full transition-all duration-300 ${desktopSidebarOpen ? 'lg:mr-72' : 'lg:mr-0'}`}>
+
+        {/* Floating show sidebar button for desktop */}
+        {!desktopSidebarOpen && (
+          <button
+            onClick={() => setDesktopSidebarOpen(true)}
+            className="hidden lg:flex fixed top-4 right-4 z-50 p-2.5 rounded-xl bg-brand-navy text-white shadow-lg border border-white/10 hover:bg-brand-indigo transition-all hover:scale-105 cursor-pointer items-center justify-center"
+            title="إظهار الشريط الجانبي"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+        )}
 
         {/* Mobile Header (Hidden on Desktop) */}
         <header className="lg:hidden bg-brand-navy text-white sticky top-0 z-40 shadow-md border-b border-white/5 no-print px-4 h-20 flex justify-between items-center">
