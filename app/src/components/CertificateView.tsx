@@ -62,7 +62,7 @@ export default function CertificateView({ onNavigate, testedInstallment, financi
       </div>
 
       {/* Main Certificate Mockup (Beautifully styled like an official credential) */}
-      <div className="bg-white rounded-3xl border-4 border-double border-amber-600/30 p-6 sm:p-12 shadow-2xl relative overflow-hidden bg-[radial-gradient(#f7f7f4_1px,transparent_1px)] [background-size:16px_16px] print:border-amber-600">
+      <div className="bg-white rounded-3xl border-4 border-double border-amber-600/30 p-6 sm:p-12 shadow-2xl relative overflow-hidden bg-[radial-gradient(var(--cert-dot)_1px,transparent_1px)] [background-size:16px_16px] print:border-amber-600">
 
         {/* Status banner if expired or used */}
         {status === 'expired' && (
@@ -105,7 +105,7 @@ export default function CertificateView({ onNavigate, testedInstallment, financi
             <img
               src="/logo.png"
               alt="Qadaha Logo"
-              className="h-12 object-contain filter invert shrink-0"
+              className="h-12 object-contain filter invert dark:filter-none shrink-0"
             />
           </div>
 
@@ -206,7 +206,7 @@ export default function CertificateView({ onNavigate, testedInstallment, financi
           {/* QR Code and link verification box */}
           <div className="flex items-center gap-4 flex-row-reverse">
             {/* Mock QR Code container with beautiful styles */}
-            <div className="w-20 h-20 bg-slate-100 rounded-xl border border-brand-gray p-2 flex items-center justify-center shrink-0">
+            <div className="w-20 h-20 bg-slate-100 rounded-xl border border-brand-gray p-2 flex items-center justify-center shrink-0 keep-white">
               <QrCode className="w-16 h-16 text-brand-navy" />
             </div>
 

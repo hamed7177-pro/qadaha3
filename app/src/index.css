@@ -69,3 +69,170 @@ body {
 .animate-loading-bar {
   animation: loadingBar 2s infinite ease-in-out;
 }
+
+/* Global variables */
+:root {
+  --cert-dot: #e2e8f0;
+}
+
+/* Global Transition for smooth theme switching */
+html, body, #root, .bg-white, .text-brand-navy, .text-slate-600, .text-slate-500, .text-slate-400, border-brand-gray, .bg-brand-bg, input, select {
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, fill 0.3s ease;
+}
+
+/* Premium Dark Mode Overrides */
+html.dark {
+  --cert-dot: #142338;
+  background-color: #030916 !important;
+  
+  body {
+    background-color: #030916 !important;
+    color: #f8fafc !important;
+  }
+
+  /* Map bg-brand-bg to dark background */
+  .bg-brand-bg {
+    background-color: #030916 !important;
+  }
+
+  /* All white cards become premium dark navy cards */
+  .bg-white {
+    background-color: #071122 !important;
+  }
+
+  /* Keep sidebar dark navy in dark mode */
+  aside.bg-brand-navy {
+    background-color: #071B33 !important;
+  }
+
+  /* Keep white helper class for QR codes and print assets */
+  .keep-white {
+    background-color: #ffffff !important;
+    border-color: #e2e8f0 !important;
+    color: #071B33 !important;
+  }
+  .keep-white svg,
+  .keep-white text,
+  .keep-white span {
+    color: #071B33 !important;
+  }
+
+  /* Warning and caution banners */
+  .bg-red-50 {
+    background-color: rgba(220, 38, 38, 0.15) !important;
+    border-color: rgba(220, 38, 38, 0.3) !important;
+    color: #fca5a5 !important;
+  }
+  .bg-amber-50 {
+    background-color: rgba(217, 119, 6, 0.15) !important;
+    border-color: rgba(217, 119, 6, 0.3) !important;
+    color: #fde047 !important;
+  }
+
+  /* Borders override */
+  .border-brand-gray,
+  .border-slate-200,
+  .border-slate-100 {
+    border-color: #142338 !important;
+  }
+
+  /* Text color overrides */
+  .text-brand-navy {
+    color: #f8fafc !important;
+  }
+
+  /* Special correction for dark backgrounds with brand-navy text to keep contrast */
+  .bg-brand-purple .text-brand-navy,
+  .bg-brand-clay .text-brand-navy,
+  .bg-brand-success .text-brand-navy {
+    color: #071B33 !important;
+  }
+
+  .text-amber-700 {
+    color: #f59e0b !important; /* Brighter amber for dark contrast */
+  }
+
+  /* Slate text overrides for readable dark mode contrast */
+  .text-slate-600,
+  .text-slate-500,
+  .text-slate-400 {
+    color: #94a3b8 !important;
+  }
+
+  .text-slate-700 {
+    color: #cbd5e1 !important;
+  }
+
+  .text-slate-800 {
+    color: #e2e8f0 !important;
+  }
+
+  .text-slate-900 {
+    color: #f8fafc !important;
+  }
+
+  /* Sub-panels (like list rows, light grey backgrounds) */
+  .bg-slate-50,
+  .bg-slate-100,
+  .bg-slate-50\/50,
+  .bg-slate-100\/50 {
+    background-color: #0c182c !important;
+  }
+
+  /* Hackathon control panel container */
+  .bg-brand-gray {
+    background-color: #081123 !important;
+    border-color: #142338 !important;
+  }
+
+  /* Button hover states in dark mode override */
+  .hover\:bg-slate-50:hover {
+    background-color: #0c182c !important;
+  }
+  .hover\:bg-slate-100:hover {
+    background-color: #0c182c !important;
+  }
+
+  /* Forms, Inputs, selects */
+  input[type="text"],
+  input[type="number"],
+  input[type="date"],
+  select {
+    background-color: #0c182c !important;
+    color: #f8fafc !important;
+    border-color: #1e293b !important;
+  }
+
+  input::placeholder {
+    color: #475569 !important;
+  }
+
+  /* Custom scrollbars in dark mode */
+  ::-webkit-scrollbar-track {
+    background: #030916 !important;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #1e293b !important;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #334155 !important;
+  }
+
+  /* SVG / Chart Overrides */
+  svg text {
+    fill: #94a3b8 !important;
+  }
+  svg text[fill="#071B33"] {
+    fill: #f8fafc !important;
+  }
+  svg text[fill="#64748b"] {
+    fill: #cbd5e1 !important;
+  }
+  
+  /* Tooltip overlay in SVG chart */
+  svg rect[fill="#071B33"] {
+    fill: #0c182c !important;
+    stroke: #1e293b !important;
+    stroke-width: 1px !important;
+  }
+}

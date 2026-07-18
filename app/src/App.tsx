@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
   ShieldCheck, Landmark, Lock, Menu, X, ArrowLeftRight, HelpCircle,
   ChevronLeft, CreditCard, Sparkles, Home, LayoutDashboard, Link2,
-  Calculator, Award, MessageSquare, LogOut, Check
+  Calculator, Award, MessageSquare, LogOut, Check, Sun, Moon
 } from 'lucide-react';
 import { ScreenId, Certificate, UserFinancials } from './types';
 
@@ -19,10 +19,24 @@ import PrivacyView from './components/PrivacyView';
 import FunderView from './components/FunderView';
 
 export default function App() {
-  const [currentScreen, setCurrentScreen] = useState<ScreenId>('landing');
+   const [currentScreen, setCurrentScreen] = useState<ScreenId>('landing');
   const [testedInstallment, setTestedInstallment] = useState<number>(1200);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [initialVerificationId, setInitialVerificationId] = useState<string>('');
+
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
+    return localStorage.getItem('theme') === 'dark';
+  });
+
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    }
+  }, [isDarkMode]);
 
   // Backend connection state variables
   const [users, setUsers] = useState<any[]>([]);
@@ -349,8 +363,25 @@ export default function App() {
 
       </div>
 
-      {/* Bottom Profile Details Card */}
+      {/* Bottom Profile Details Card with Dark Mode toggle */}
       <div className="border-t border-white/10 pt-4 space-y-4 text-right">
+        <button
+          onClick={() => setIsDarkMode(prev => !prev)}
+          className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-bold text-slate-300 hover:text-white hover:bg-white/5 transition-all cursor-pointer group"
+        >
+          {isDarkMode ? (
+            <>
+              <Sun className="w-4 h-4 text-amber-400 shrink-0" />
+              <span>الوضع النهاري</span>
+            </>
+          ) : (
+            <>
+              <Moon className="w-4 h-4 text-slate-400 group-hover:text-amber-200 shrink-0" />
+              <span>الوضع الليلي</span>
+            </>
+          )}
+        </button>
+
         {selectedUser ? (
           <div className="flex items-center gap-3">
             {/* Avatar frame */}
@@ -443,13 +474,23 @@ export default function App() {
             <span>الربط آمن</span>
           </div>
 
-          {/* Mobile menu Toggle */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2 text-white hover:text-brand-clay transition-colors cursor-pointer"
-          >
-            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
+          {/* Mobile Actions: Dark Mode & Menu Toggle */}
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => setIsDarkMode(prev => !prev)}
+              className="p-2 text-white hover:text-brand-clay transition-colors cursor-pointer"
+              title={isDarkMode ? "الوضع النهاري" : "الوضع الليلي"}
+            >
+              {isDarkMode ? <Sun className="w-5 h-5 text-amber-400" /> : <Moon className="w-5 h-5 text-slate-400" />}
+            </button>
+
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="p-2 text-white hover:text-brand-clay transition-colors cursor-pointer"
+            >
+              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+          </div>
 
         </header>
 
