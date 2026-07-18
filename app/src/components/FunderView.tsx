@@ -25,9 +25,10 @@ export default function FunderView({
   onResetCertificate
 }: FunderViewProps) {
   const [searchId, setSearchId] = useState('');
-  const [isValidated, setIsValidated] = useState(true);
-  const [searchTriggered, setSearchTriggered] = useState(true);
+  const [isValidated, setIsValidated] = useState(false);
+  const [searchTriggered, setSearchTriggered] = useState(false);
   const [selectedBank, setSelectedBank] = useState('بنك الراجحي');
+  const [hasInitialized, setHasInitialized] = useState(false);
 
   // Update state and validate when initialVerificationId or certificate changes
   useEffect(() => {
@@ -37,12 +38,13 @@ export default function FunderView({
                       initialVerificationId.trim().toUpperCase() === 'QDH-2026-0182';
       setIsValidated(isMatch);
       setSearchTriggered(true);
-    } else if (certificate) {
+    } else if (certificate && !hasInitialized) {
       setSearchId(certificate.verificationId);
-      setIsValidated(true);
-      setSearchTriggered(true);
+      setIsValidated(false);
+      setSearchTriggered(false);
+      setHasInitialized(true);
     }
-  }, [initialVerificationId, certificate]);
+  }, [initialVerificationId, certificate, hasInitialized]);
 
   const handleValidate = (e: React.FormEvent) => {
     e.preventDefault();

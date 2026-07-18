@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Sparkles, HelpCircle, ArrowLeft, ArrowRight, ShieldCheck, ChevronLeft, CreditCard, Landmark, Percent } from 'lucide-react';
 import { ScreenId, UserFinancials } from '../types';
 import RiyalSymbol, { formatCurrency } from './RiyalSymbol';
@@ -20,6 +20,15 @@ export default function TestObligationView({
 }: TestObligationViewProps) {
   
   const [installment, setInstallment] = useState<number>(currentInstallment);
+
+  useEffect(() => {
+    if (financials && (currentInstallment === 0 || currentInstallment === 1200)) {
+      const avg = financials.avgMonthlyIncome12m;
+      const current = financials.monthlyObligations;
+      const recommended = Math.max(0, Math.floor(0.33 * avg - current));
+      setInstallment(recommended);
+    }
+  }, [financials, currentInstallment]);
   const [loanType, setLoanType] = useState<string>('تمويل شخصي مرن');
   const [duration, setDuration] = useState<number>(60);
   const [firstPaymentDate, setFirstPaymentDate] = useState<string>('2026-08-01');
@@ -91,6 +100,36 @@ export default function TestObligationView({
         </div>
       </div>
 
+      {/* Safe Solvency Indicator Guidance Note (Clear and in Front) */}
+      <div className="bg-gradient-to-r from-brand-purple/10 to-brand-indigo/5 rounded-3xl p-6 border border-brand-purple/20 shadow-md text-right flex flex-col md:flex-row-reverse justify-between items-start md:items-center gap-6 transition-all hover:shadow-lg">
+        <div className="space-y-2 flex-1">
+          <div className="flex items-center gap-2 flex-row-reverse justify-start text-brand-purple">
+            <Sparkles className="w-5 h-5 shrink-0 animate-pulse text-brand-purple" />
+            <span className="text-sm font-black">إرشادات الملاءة الآمنة (قدها):</span>
+          </div>
+          <p className="text-xs text-slate-600 leading-relaxed">
+            يفضل أن يكون مؤشر ملاءة قدها الذكي بين <span className="font-bold text-brand-purple">80 إلى 100</span> للحفاظ على استقرارك المالي. لتبقى في النطاق الآمن والمستقر، ننصح بألا يتجاوز قسطك الجديد القيمة الموصى بها.
+          </p>
+          {recommendedInstallment === 0 && (
+            <p className="text-[10px] text-brand-clay leading-relaxed font-bold">
+              * تنبيه: التزاماتك القائمة مرتفعة بالنسبة لدخلك الحالي، يفضل خفض الالتزامات قبل التقدم لتمويل جديد.
+            </p>
+          )}
+        </div>
+        
+        {/* Recommended Installment Badge */}
+        <div className="bg-white border border-brand-purple/15 px-6 py-4 rounded-2xl flex flex-col items-center justify-center shrink-0 w-full md:w-auto shadow-sm">
+          <span className="text-[10px] text-slate-400 font-bold block mb-1 flex items-center gap-1.5 flex-row-reverse">
+            <ShieldCheck className="w-3.5 h-3.5 text-brand-success" />
+            <span>الحد الأقصى للقسط الآمن موصى به</span>
+          </span>
+          <span className="text-xl sm:text-2xl font-black text-brand-navy font-mono flex items-center gap-1">
+            {formatCurrency(recommendedInstallment)}
+            <RiyalSymbol className="text-xs text-slate-500" />
+          </span>
+        </div>
+      </div>
+
       {/* Main Container */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
@@ -132,6 +171,24 @@ export default function TestObligationView({
                   placeholder="1200"
                 />
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400"><RiyalSymbol className="text-slate-400" /></span>
+              </div>
+              
+              {/* Quick actions: Set to 0 or Recommended Max */}
+              <div className="flex gap-2 pt-1 justify-start flex-row-reverse">
+                <button
+                  type="button"
+                  onClick={() => setInstallment(0)}
+                  className="px-2.5 py-1 rounded-lg border border-brand-gray hover:border-brand-purple hover:bg-brand-purple/5 text-[10px] font-bold text-slate-500 hover:text-brand-purple transition-all cursor-pointer"
+                >
+                  إعادة تعيين للصفر (0)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setInstallment(recommendedInstallment)}
+                  className="px-2.5 py-1 rounded-lg border border-brand-purple/20 hover:border-brand-purple hover:bg-brand-purple/5 text-[10px] font-bold text-brand-purple transition-all cursor-pointer"
+                >
+                  الحد الأقصى الموصى به ({formatCurrency(recommendedInstallment)} <RiyalSymbol className="mr-0.5" />)
+                </button>
               </div>
             </div>
 
@@ -257,22 +314,6 @@ export default function TestObligationView({
               * يقوم المحاكي بقياس الأثر الإحصائي العام ولا يشكل أي موافقة رسمية من الجهات المقرضة.
             </div>
 
-          </div>
-
-          {/* Safe Solvency Indicator Guidance Note */}
-          <div className="bg-white rounded-3xl p-6 border border-brand-gray shadow-md text-right space-y-3">
-            <div className="flex items-center gap-2 flex-row-reverse justify-start text-brand-purple">
-              <Sparkles className="w-5 h-5 shrink-0" />
-              <span className="text-sm font-black">إرشادات الملاءة الآمنة (قدها):</span>
-            </div>
-            <p className="text-xs text-slate-600 leading-relaxed">
-              يفضل أن يكون مؤشر ملاءة قدها الذكي بين <span className="font-bold text-brand-purple">80 إلى 100</span> للحفاظ على استقرارك المالي. بناءً على تحليلك المالي الحالي، ننصح بألا يتجاوز القسط الجديد قيمة <span className="font-bold text-brand-navy font-mono">{formatCurrency(recommendedInstallment)} <RiyalSymbol className="mr-0.5 text-slate-500" /></span> شهرياً لتبقى في النطاق الآمن والمستقر.
-            </p>
-            {recommendedInstallment === 0 && (
-              <p className="text-[10px] text-brand-clay leading-relaxed">
-                * تنبيه: التزاماتك القائمة مرتفعة بالنسبة لدخلك الحالي، يفضل خفض الالتزامات قبل التقدم لتمويل جديد.
-              </p>
-            )}
           </div>
 
         </div>
